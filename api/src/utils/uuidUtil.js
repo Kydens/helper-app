@@ -1,0 +1,8 @@
+// get uuid dari library uuid
+const { v4: uuidv4 } = require("uuid");
+
+function generateUUID() {
+  return uuidv4();
+}
+
+module.exports = generateUUID;
