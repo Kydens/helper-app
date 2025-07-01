@@ -1,0 +1,18 @@
+{
+  "name": "helper-app",
+  "version": "1.0.0",
+  "description": "Aplikasi untuk membantu anda",
+  "main": "ecosystem.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eddy Nathansyah",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.2.0",
+    "pm2": "^6.0.8"
+  },
+  "devDependencies": {
+    "nuxt": "^3.17.5"
+  }
+}
