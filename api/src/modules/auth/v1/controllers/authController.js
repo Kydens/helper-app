@@ -1,24 +1,25 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { Op } = require("sequelize");
-const constants = require("../../../../config/constants");
-const sendResponse = require("../../../../utils/responseUtil");
-const Users = require("../models/s_users");
-const UserCookies = require("../models/s_user_cookies");
-const UserLogs = require("../models/s_user_logs");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
+const constants = require('../../../../config/constants');
+const sendResponse = require('../../../../utils/responseUtil');
+const Users = require('../models/s_users');
+const UserCookies = require('../models/s_user_cookies');
+const UserLogs = require('../models/s_user_logs');
 const {
   getRoleByIdUserService,
-} = require("../../../master/v1/services/rolesService");
+} = require('../../../master/v1/services/rolesService');
+const generateUUID = require('../../../../utils/uuidUtil');
 
 exports.login = async (req, res) => {
-  const { account, device = "web", password } = req.body;
+  const { account, device = 'web', password } = req.body;
 
   if (!account || !password) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Harap mengisi akun dan kata sandi anda."
+      'error',
+      'Harap mengisi akun dan kata sandi anda.'
     );
   }
 
@@ -33,8 +34,8 @@ exports.login = async (req, res) => {
       return sendResponse(
         res,
         400,
-        "error",
-        "Email atau kata sandi tidak sesuai."
+        'error',
+        'Email atau kata sandi tidak sesuai.'
       );
     }
 
@@ -43,8 +44,8 @@ exports.login = async (req, res) => {
       return sendResponse(
         res,
         400,
-        "error",
-        "Email atau kata sandi tidak sesuai"
+        'error',
+        'Email atau kata sandi tidak sesuai'
       );
     }
 
@@ -52,8 +53,8 @@ exports.login = async (req, res) => {
       return sendResponse(
         res,
         403,
-        "error",
-        "Akun anda tidak aktif, silahkan lakukan aktivasi"
+        'error',
+        'Akun anda tidak aktif, silahkan lakukan aktivasi'
       );
     }
 
@@ -80,30 +81,32 @@ exports.login = async (req, res) => {
       Date.now() + 7 * 24 * 60 * 60 * 1000
     ); // 7 hari
 
-    res.cookie("users_cookies", refreshToken, { httpOnly: true, secure: true });
+    res.cookie('users_cookies', refreshToken, { httpOnly: true, secure: true });
 
     // simpan access token dan refresh token di cookies
     await UserCookies.createUserCookie(
+      generateUUID(),
       user.id,
       req.ip,
       accessToken,
       refreshToken,
-      req.headers["user-agent"],
+      req.headers['user-agent'],
       refreshTokenExpiresAt
     );
 
     //
     await UserLogs.createUserLog(
+      generateUUID(),
       user.id,
       user.username,
       req.ip,
-      req.headers["user-agent"],
-      "login",
+      req.headers['user-agent'],
+      'login',
       device,
-      "Pengguna telah berhasil login"
+      'Pengguna telah berhasil login'
     );
 
-    return sendResponse(res, 200, "success", "Login berhasil", {
+    return sendResponse(res, 200, 'success', 'Login berhasil', {
       id: user.id,
       username: user.username,
       email: user.email,
@@ -112,7 +115,7 @@ exports.login = async (req, res) => {
       refreshToken,
     });
   } catch (error) {
-    console.error("Error in auth login controller: ", error.message);
-    return sendResponse(res, 500, "error", "Server error");
+    console.error('Error in auth login controller: ', error.message);
+    return sendResponse(res, 500, 'error', 'Server error');
   }
 };

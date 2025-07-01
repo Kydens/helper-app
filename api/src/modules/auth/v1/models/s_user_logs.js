@@ -1,11 +1,16 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../../../../config/sequelize");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../../../config/sequelize');
 
 const UserLogs = sequelize.define(
-  "UserLogs",
+  'UserLogs',
   {
+    id: {
+      type: DataTypes.STRING(36),
+      allowNull: false,
+      primaryKey: true,
+    },
     user_id: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(36),
       allowNull: false,
     },
     username: {
@@ -17,7 +22,7 @@ const UserLogs = sequelize.define(
       allowNull: false,
     },
     browser: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true,
     },
     status_logs: {
@@ -38,13 +43,14 @@ const UserLogs = sequelize.define(
     },
   },
   {
-    tableName: "s_users_logs",
+    tableName: 's_users_logs',
     timestamps: false,
   }
 );
 
 // Menambahkan metode statis untuk membuat UserLog
 UserLogs.createUserLog = async function (
+  id,
   userId,
   username,
   ipAddress,
@@ -54,6 +60,7 @@ UserLogs.createUserLog = async function (
   description
 ) {
   return await UserLogs.create({
+    id: id,
     user_id: userId,
     username: username,
     ip_address: ipAddress,

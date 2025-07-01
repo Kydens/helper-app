@@ -1,11 +1,16 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../../../../config/sequelize");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../../../config/sequelize');
 
 const UserCookies = sequelize.define(
-  "UserCookies",
+  'UserCookies',
   {
+    id: {
+      type: DataTypes.STRING(36),
+      allowNull: false,
+      primaryKey: true,
+    },
     user_id: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(36),
       allowNull: false,
     },
     ip_address: {
@@ -13,15 +18,15 @@ const UserCookies = sequelize.define(
       allowNull: false,
     },
     browser: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true,
     },
     access_token: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     refresh_token: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     is_active: {
@@ -46,13 +51,14 @@ const UserCookies = sequelize.define(
     },
   },
   {
-    tableName: "s_users_cookies",
+    tableName: 's_users_cookies',
     timestamps: false,
   }
 );
 
 // Menambahkan metode statis untuk membuat UserCookie
 UserCookies.createUserCookie = async function (
+  id,
   userId,
   ipAddress,
   token,
@@ -61,6 +67,7 @@ UserCookies.createUserCookie = async function (
   expiredAt
 ) {
   return await UserCookies.create({
+    id: id,
     user_id: userId,
     ip_address: ipAddress,
     access_token: token,

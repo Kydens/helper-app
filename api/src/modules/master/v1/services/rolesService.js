@@ -1,15 +1,15 @@
-const pool = require("../../../../config/database");
-const Roles = require("../models/s_roles");
+const pool = require('../../../../config/database');
+const Roles = require('../models/s_roles');
 const {
   generateAlias,
   getCheckAlias,
   generateNewAlias,
   convertArrayToSingleJson,
-} = require("../../../../utils/utils");
-const generateUUID = require("../../../../utils/uuidUtil");
-const { insertTransaction } = require("../../../../utils/crudUtil");
+} = require('../../../../utils/utils');
+const generateUUID = require('../../../../utils/uuidUtil');
+const { insertTransaction } = require('../../../../utils/crudUtil');
 
-let tableDB = "s_roles";
+let tableDB = 's_roles';
 
 const createRoleService = async (req) => {
   const client = await pool.connect();
@@ -17,7 +17,7 @@ const createRoleService = async (req) => {
   const now = new Date();
   const row = req.body;
   try {
-    await client.query("BEGIN");
+    await client.query('BEGIN');
 
     const rowDataRole = {
       id: generateUUID(),
@@ -38,13 +38,13 @@ const createRoleService = async (req) => {
       rowDataRole.alias = newAlias;
     }
 
-    const rowRole = await insertTransaction(client, tableDB, rowDataRole, "*");
+    const rowRole = await insertTransaction(client, tableDB, rowDataRole, '*');
 
-    await client.query("COMMIT");
+    await client.query('COMMIT');
     return rowRole;
   } catch (error) {
-    await client.query("ROLLBACK");
-    console.log("Error in createRoleService: ", error.message);
+    await client.query('ROLLBACK');
+    console.log('Error in createRoleService: ', error.message);
     throw error;
   } finally {
     client.release();
@@ -78,11 +78,12 @@ const getRoleByIdUserService = async (userId) => {
 };
 
 const getRoleIdUserService = async () => {
-  return await Roles.findOne({ where: { alias: "USER" } });
+  const roles = await Roles.findOne({ where: { alias: 'USER' } });
+  return roles.id;
 };
 
 const getJsonRowRoleService = (data) => {
-  const checkList = Array.isArray(data) ? "array" : "single";
+  const checkList = Array.isArray(data) ? 'array' : 'single';
   const dataArray = Array.isArray(data) ? data : [data];
 
   const json = dataArray.map((row) => ({
@@ -95,7 +96,7 @@ const getJsonRowRoleService = (data) => {
     description: row.description,
   }));
 
-  if (checkList == "array") {
+  if (checkList == 'array') {
     return json;
   } else {
     return convertArrayToSingleJson(json);

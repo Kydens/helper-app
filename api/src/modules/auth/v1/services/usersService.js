@@ -1,18 +1,18 @@
-const bcrypt = require("bcrypt");
-const pool = require("../../../../config/database");
-const constants = require("../../../../config/constants");
-const generateUUID = require("../../../../utils/uuidUtil");
+const bcrypt = require('bcrypt');
+const pool = require('../../../../config/database');
+const constants = require('../../../../config/constants');
+const generateUUID = require('../../../../utils/uuidUtil');
 const {
   insertTransaction,
   updateTransaction,
-} = require("../../../../utils/crudUtil");
-const { convertArrayToSingleJson } = require("../../../../utils/utils");
-const Users = require("../models/s_users");
+} = require('../../../../utils/crudUtil');
+const { convertArrayToSingleJson } = require('../../../../utils/utils');
+const Users = require('../models/s_users');
 const {
   getRoleIdUserService,
-} = require("../../../master/v1/services/rolesService");
+} = require('../../../master/v1/services/rolesService');
 
-const tableDB = "s_users";
+const tableDB = 's_users';
 
 const createUserService = async (req) => {
   const roleUser = await getRoleIdUserService();
@@ -21,12 +21,12 @@ const createUserService = async (req) => {
   const row = req.body;
 
   try {
-    await client.query("BEGIN");
+    await client.query('BEGIN');
 
     let hashedPassword = null;
     if (row.password) {
       if (row.password.length < 8)
-        throw new Error("Password minimal 8 karakter!");
+        throw new Error('Password minimal 8 karakter!');
 
       hashedPassword = await bcrypt.hash(
         row.password,
@@ -53,14 +53,15 @@ const createUserService = async (req) => {
       [rowDataUser.email, rowDataUser.username]
     );
 
-    if (userExisted[0]) throw new Error("Username atau Email sudah terpakai.");
+    if (userExisted[0]) throw new Error('Username atau Email sudah terpakai.');
 
-    const rowUser = await insertTransaction(client, tableDB, rowDataUser, "*");
+    const rowUser = await insertTransaction(client, tableDB, rowDataUser, '*');
+    console.log('rowUser: ', rowUser);
 
-    const userId = req.user?.id ?? rowUser.id;
+    const userId = rowUser.id;
     const additionalData = [
       {
-        table: "s_user_roles",
+        table: 's_user_roles',
         data: {
           id: generateUUID(),
           created_by: userId,
@@ -72,17 +73,21 @@ const createUserService = async (req) => {
       },
     ];
 
-    await Promise.all(
+    console.log('additionalData: ', additionalData);
+
+    const rowAdditional = await Promise.all(
       additionalData.map((item) =>
-        insertTransaction(client, item.table, item.data, "id")
+        insertTransaction(client, item.table, item.data, 'id')
       )
     );
 
-    await client.query("COMMIT");
+    console.log('rowAdditional: ', rowAdditional);
+
+    await client.query('COMMIT');
     return rowUser;
   } catch (error) {
-    await client.query("ROLLBACK");
-    console.log("Error in createUserService: ", error.message);
+    await client.query('ROLLBACK');
+    console.log('Error in createUserService: ', error.message);
     throw error;
   } finally {
     client.release();
@@ -109,7 +114,7 @@ const getUserByIdService = async (id) => {
 };
 
 const getJsonRowUserService = (data) => {
-  const checkList = Array.isArray(data) ? "array" : "tunggal";
+  const checkList = Array.isArray(data) ? 'array' : 'tunggal';
   const dataArray = Array.isArray(data) ? data : [data];
 
   const json = dataArray.map((row) => ({
@@ -125,7 +130,7 @@ const getJsonRowUserService = (data) => {
     verifyEmailDate: row.verify_email_date,
   }));
 
-  if (checkList == "array") {
+  if (checkList == 'array') {
     return json;
   } else {
     return convertArrayToSingleJson(json);

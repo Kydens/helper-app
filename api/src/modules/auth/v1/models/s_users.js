@@ -1,11 +1,12 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../../../../config/sequelize");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../../../config/sequelize');
 
 const Users = sequelize.define(
-  "s_users",
+  's_users',
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(36),
+      allowNull: false,
       primaryKey: true,
     },
     created_at: {
@@ -14,7 +15,7 @@ const Users = sequelize.define(
       defaultValue: DataTypes.NOW,
     },
     created_by: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(36),
       allowNull: true,
     },
     updated_at: {
@@ -22,7 +23,7 @@ const Users = sequelize.define(
       allowNull: true,
     },
     updated_by: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(36),
       allowNull: true,
     },
     deleted_at: {
@@ -30,7 +31,7 @@ const Users = sequelize.define(
       allowNull: true,
     },
     deleted_by: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(36),
       allowNull: true,
     },
     is_deleted: {
@@ -73,7 +74,7 @@ const Users = sequelize.define(
     },
   },
   {
-    tableName: "s_users",
+    tableName: 's_users',
     timestamps: false,
   }
 );
