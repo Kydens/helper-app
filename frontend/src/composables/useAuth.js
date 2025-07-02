@@ -1,8 +1,6 @@
-import { useRouter } from 'vue-router';
 import { useRuntimeConfig } from '#app';
 
 export const useAuth = () => {
-  const router = useRouter();
   const config = useRuntimeConfig();
 
   const login = async (account, password) => {
@@ -21,11 +19,16 @@ export const useAuth = () => {
       });
 
       if (res.success) {
-        localStorage.setItem('accessToken', res.data.accessToken);
-        localStorage.setItem('refreshToken', res.data.refreshToken);
-
-        // opsional: arahkan ke dashboard
-        router.push('/');
+        useCookie('accessToken', {
+          secure: true,
+          sameSite: 'lax',
+          path: '/',
+        }).value = res.data.accessToken;
+        useCookie('refreshToken', {
+          secure: true,
+          sameSite: 'lax',
+          path: '/',
+        }).value = res.data.refreshToken;
       } else {
         throw new Error(res.message);
       }
@@ -38,12 +41,24 @@ export const useAuth = () => {
   };
 
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    useCookie('accessToken', {
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+    }).value = null;
+    useCookie('refreshToken', {
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+    }).value = null;
   };
 
-  const getToken = () => localStorage.getItem('accessToken');
-  const getRefreshToken = () => localStorage.getItem('refreshToken');
+  const getToken = () =>
+    useCookie('accessToken', { secure: true, sameSite: 'lax', path: '/' })
+      .value;
+  const getRefreshToken = () =>
+    useCookie('refreshToken', { secure: true, sameSite: 'lax', path: '/' })
+      .value;
 
   return { login, logout, getToken, getRefreshToken };
 };
