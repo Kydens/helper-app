@@ -9,7 +9,14 @@ export default defineNuxtConfig({
     },
   },
   css: ['~/assets/css/main.css'],
-  modules: ['shadcn-nuxt'],
+  modules: ['shadcn-nuxt', '@nuxt/icon'],
+  icon: {
+    mode: 'css',
+    cssLayer: 'base',
+    serverBundle: {
+      collections: ['material-symbols'],
+    },
+  },
   shadcn: {
     /**
      * Prefix for all the imported component
