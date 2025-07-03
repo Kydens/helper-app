@@ -86,10 +86,10 @@
           <p class="text-center text-sm text-muted-foreground">
             Sudan punya akun?
             <NuxtLink
-              to="/signup"
+              to="/login"
               class="text-blue-500 transition duration-500 ease-in-out hover:underline hover:duration-500 hover:ease-in-out"
             >
-              Daftar sekarang
+              Login sekarang
             </NuxtLink>
           </p>
         </CardFooter>
@@ -159,7 +159,7 @@ const handleSignup = async () => {
       timer: 1500,
     });
 
-    return router.push('/');
+    return router.push('/login');
   } catch (e) {
     await $swal.fire({
       icon: 'error',
