@@ -40,6 +40,7 @@ const handleLogout = async () => {
             icon: 'success',
             timer: 1500,
             showConfirmButton: false,
+            allowOusideCLick: false,
           });
 
           logout();

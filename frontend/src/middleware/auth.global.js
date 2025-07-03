@@ -4,8 +4,14 @@ export default defineNuxtRouteMiddleware((to, from) => {
     ? parseCookies(useRequestHeaders(['cookie']).cookie || '').accessToken
     : useCookie('accessToken').value;
 
-  if (!accessToken && !['/login', '/signup'].includes(to.path)) {
+  const isAuthPage = ['/login', '/signup'].includes(to.path);
+
+  if (!accessToken && !isAuthPage) {
     return navigateTo('/login');
+  }
+
+  if (accessToken && isAuthPage) {
+    return navigateTo('/');
   }
 });
 
