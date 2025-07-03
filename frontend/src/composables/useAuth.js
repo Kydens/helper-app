@@ -40,6 +40,31 @@ export const useAuth = () => {
     }
   };
 
+  const signup = async (username, email, password) => {
+    try {
+      const res = await $fetch(`${config.public.apiBase}/api/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: {
+          username: username,
+          email: email,
+          password: password,
+        },
+      });
+
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+
+      return res;
+    } catch (e) {
+      console.log(e.message);
+      throw e;
+    }
+  };
+
   const logout = () => {
     useCookie('accessToken', {
       secure: true,
@@ -60,5 +85,5 @@ export const useAuth = () => {
     useCookie('refreshToken', { secure: true, sameSite: 'lax', path: '/' })
       .value;
 
-  return { login, logout, getToken, getRefreshToken };
+  return { login, signup, logout, getToken, getRefreshToken };
 };
