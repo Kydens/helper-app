@@ -75,7 +75,7 @@
           </div>
         </CardContent>
 
-        <CardFooter class="flex flex-col gap-3 mt-5">
+        <CardFooter class="flex flex-col gap-3 mt-5 mb-4">
           <Button
             type="submit"
             class="w-full transition-all hover:cursor-pointer"
@@ -94,6 +94,10 @@
           </p>
         </CardFooter>
       </form>
+
+      <p class="w-full text-center text-sm text-muted-foreground pt-3 border-t">
+        © 2025 Eddy Nathansyah. All rights reserved.
+      </p>
     </Card>
   </div>
 </template>
