@@ -1,11 +1,11 @@
-const sendResponse = require("../../../../utils/responseUtil");
-const { getUserIdFromToken } = require("../../../../utils/utils");
+const sendResponse = require('../../../../utils/responseUtil');
+const { getUserIdFromToken, checkIsAdmin } = require('../../../../utils/utils');
 const {
   createUserService,
   getJsonRowUserService,
   getAllUsersService,
   getUserByIdService,
-} = require("../services/usersService");
+} = require('../services/usersService');
 
 const createUsers = async (req, res) => {
   try {
@@ -15,39 +15,77 @@ const createUsers = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menambahkan akun user",
+      'success',
+      'Berhasil menambahkan akun user',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal menambahkan akun user",
+      'error',
+      'Gagal menambahkan akun user',
       error.message
     );
   }
 };
 
 const getAllUsers = async (req, res) => {
+  if (!checkIsAdmin) {
+    return sendResponse(
+      res,
+      500,
+      'error',
+      'Maaf, anda tidak memiliki akses ini!'
+    );
+  }
+
   try {
-    const user = await getAllUsersService();
-    const result = await getJsonRowUserService(user);
+    const {
+      size = 10,
+      page = 0,
+      search = '',
+      sortBy = 'created_at',
+      sortOrder = 'DESC',
+      startDate,
+      endDate,
+    } = req.query;
+
+    const offset = parseInt(page) * parseInt(size);
+    const { data, total } = await getAllUsersService(
+      size,
+      offset,
+      search,
+      sortBy,
+      sortOrder,
+      startDate,
+      endDate
+    );
+
+    const result = await getJsonRowUserService(data);
+    const totalPages = Math.ceil(total / size);
 
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menampilkan semua user",
-      result
+      'success',
+      'Berhasil menampilkan semua user',
+      {
+        data: result,
+        paging: {
+          currentPage: parseInt(page),
+          totalPage: totalPages,
+          total: total,
+          size: parseInt(size),
+        },
+      }
     );
   } catch (error) {
     return sendResponse(
       res,
       500,
-      "error",
-      "Gagal menampilkan semua user",
+      'error',
+      'Gagal menampilkan semua user',
       error.message
     );
   }
@@ -62,16 +100,16 @@ const getUserById = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menampilkan user",
+      'success',
+      'Berhasil menampilkan user',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       500,
-      "error",
-      "Gagal menampilkan user",
+      'error',
+      'Gagal menampilkan user',
       error.message
     );
   }

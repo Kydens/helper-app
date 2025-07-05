@@ -56,7 +56,6 @@ const createUserService = async (req) => {
     if (userExisted[0]) throw new Error('Username atau Email sudah terpakai.');
 
     const rowUser = await insertTransaction(client, tableDB, rowDataUser, '*');
-    console.log('rowUser: ', rowUser);
 
     const userId = rowUser.id;
     const additionalData = [
@@ -73,15 +72,11 @@ const createUserService = async (req) => {
       },
     ];
 
-    console.log('additionalData: ', additionalData);
-
     const rowAdditional = await Promise.all(
       additionalData.map((item) =>
         insertTransaction(client, item.table, item.data, 'id')
       )
     );
-
-    console.log('rowAdditional: ', rowAdditional);
 
     await client.query('COMMIT');
     return rowUser;
@@ -94,13 +89,40 @@ const createUserService = async (req) => {
   }
 };
 
-const getAllUsersService = async () => {
-  let query = `
-      SELECT * FROM ${tableDB}
-    `;
+const getAllUsersService = async (
+  size,
+  offset,
+  search = '',
+  sortBy = 'created_at',
+  sortOrder = 'DESC',
+  startDate,
+  endDate
+) => {
+  const whereClause = {
+    is_deleted: false,
+  };
 
-  const { rows } = await pool.query(query);
-  return rows;
+  if (search) {
+    whereClause[Op.or] = [
+      { title: { [Op.iLike]: `%${search}%` } },
+      { description: { [Op.iLike]: `%${search}%` } },
+    ];
+  }
+
+  if (startDate && endDate) {
+    whereClause.created_at = {
+      [Op.between]: [startDate, endDate],
+    };
+  }
+
+  const { count, rows } = await Users.findAndCountAll({
+    where: whereClause,
+    limit: parseInt(size),
+    offset: parseInt(offset),
+    order: [[sortBy, sortOrder.toUpperCase()]],
+  });
+
+  return { data: rows, total: count };
 };
 
 const getUserByIdService = async (id) => {
