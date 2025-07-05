@@ -1,4 +1,5 @@
 import { useRuntimeConfig } from '#app';
+import { jwtDecode } from 'jwt-decode';
 
 export const useAuth = () => {
   const config = useRuntimeConfig();
@@ -18,6 +19,10 @@ export const useAuth = () => {
         },
       });
 
+      const decoded = jwtDecode(res.data.accessToken);
+      console.log(decoded);
+      const role = decoded?.role_alias || null;
+
       if (res.success) {
         useCookie('accessToken', {
           secure: true,
@@ -29,6 +34,11 @@ export const useAuth = () => {
           sameSite: 'lax',
           path: '/',
         }).value = res.data.refreshToken;
+        useCookie('userRole', {
+          secure: true,
+          sameSite: 'lax',
+          path: '/',
+        }).value = role;
       } else {
         throw new Error(res.message);
       }
@@ -72,6 +82,11 @@ export const useAuth = () => {
       path: '/',
     }).value = null;
     useCookie('refreshToken', {
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+    }).value = null;
+    useCookie('userRole', {
       secure: true,
       sameSite: 'lax',
       path: '/',

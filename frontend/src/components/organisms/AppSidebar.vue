@@ -23,6 +23,26 @@
                 </NuxtLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
+
+            <!-- admin -->
+            <template v-if="role === 'ADMIN'">
+              <SidebarMenuItem v-for="item in adminItems" :key="item.title">
+                <SidebarMenuButton asChild>
+                  <NuxtLink
+                    :href="item.url"
+                    :class="[
+                      'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium',
+                      route.path === item.url
+                        ? 'bg-sidebar-accent-foreground text-sidebar-accent'
+                        : 'hover:bg-muted hover:text-foreground',
+                    ]"
+                  >
+                    <Icon :name="item.icon" />
+                    <span>{{ item.title }}</span>
+                  </NuxtLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </template>
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
@@ -31,6 +51,7 @@
 </template>
 
 <script setup>
+import { useUser } from '../../composables/useUser';
 import { Home, ListTodo } from 'lucide-vue-next';
 import {
   Sidebar,
@@ -41,6 +62,7 @@ import {
 } from '../ui/sidebar';
 
 const route = useRoute();
+const { role } = useUser();
 
 const items = [
   {
@@ -52,6 +74,14 @@ const items = [
     title: 'Todolist',
     url: '/todolist',
     icon: 'material-symbols:checklist',
+  },
+];
+
+const adminItems = [
+  {
+    title: 'Master Data',
+    url: '/masterData',
+    icon: 'material-symbols:database',
   },
 ];
 </script>
