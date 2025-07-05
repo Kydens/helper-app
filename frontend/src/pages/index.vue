@@ -13,6 +13,10 @@
 </template>
 
 <script setup>
+// definePageMeta({
+//   layout: 'default',
+// });
+
 import { useRuntimeConfig } from '#app';
 import { ref, onMounted } from 'vue';
 import { useAuth } from '../composables/useAuth';

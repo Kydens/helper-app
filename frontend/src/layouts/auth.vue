@@ -7,16 +7,9 @@
       <!-- Tambahkan meta atau link lain di sini kalau perlu -->
     </Head>
 
-    <!-- Sidebar -->
-    <SidebarProvider>
-      <div class="flex">
-        <AppSidebar />
-        <main class="flex-1">
-          <SidebarTrigger class="m-2" />
-          <slot />
-        </main>
-      </div>
-    </SidebarProvider>
+    <main>
+      <slot />
+    </main>
 
     <!-- Tambahkan skrip global atau komponen footer jika ada -->
   </div>
@@ -24,8 +17,6 @@
 
 <script setup>
 // Bisa tambahkan global setup jika dibutuhkan
-import AppSidebar from '~/components/organisms/AppSidebar.vue';
-import { SidebarProvider, SidebarTrigger } from '~/components/ui/sidebar';
 </script>
 
 <style scoped>
