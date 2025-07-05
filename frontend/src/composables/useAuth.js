@@ -20,7 +20,6 @@ export const useAuth = () => {
       });
 
       const decoded = jwtDecode(res.data.accessToken);
-      console.log(decoded);
       const role = decoded?.role_alias || null;
 
       if (res.success) {
