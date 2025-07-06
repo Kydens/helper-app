@@ -33,11 +33,6 @@ export const useAuth = () => {
           sameSite: 'lax',
           path: '/',
         }).value = res.data.refreshToken;
-        useCookie('userRole', {
-          secure: true,
-          sameSite: 'lax',
-          path: '/',
-        }).value = role;
       } else {
         throw new Error(res.message);
       }
@@ -81,11 +76,6 @@ export const useAuth = () => {
       path: '/',
     }).value = null;
     useCookie('refreshToken', {
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-    }).value = null;
-    useCookie('userRole', {
       secure: true,
       sameSite: 'lax',
       path: '/',
