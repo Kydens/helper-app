@@ -18,13 +18,25 @@ export const useApiFetch = async (url, options = {}) => {
     });
 
     if (!res.success) {
-      // Tangkap error dari API meskipun HTTP-nya 200
       throw new Error(res.message || 'Terjadi kesalahan pada server.');
     }
 
     return res;
   } catch (e) {
-    // Tangkap error dari jaringan atau throw manual
+    if (e?.response?.status === 400) {
+      await $swal.fire({
+        icon: 'warning',
+        timer: 1000,
+        text: e?.response?._data?.message,
+        showConfirmButton: false,
+      });
+
+      useCookie('accessToken').value = null;
+      useCookie('refreshToken').value = null;
+      router.push('/login');
+      return;
+    }
+
     throw new Error(
       e?.data?.message || e?.message || 'Terjadi kesalahan tak dikenal.'
     );
