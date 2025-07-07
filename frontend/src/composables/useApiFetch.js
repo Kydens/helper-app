@@ -23,7 +23,7 @@ export const useApiFetch = async (url, options = {}) => {
 
     return res;
   } catch (e) {
-    if (e?.response?.status === 400) {
+    if (e?.response?.status === 401) {
       await $swal.fire({
         icon: 'warning',
         timer: 1000,

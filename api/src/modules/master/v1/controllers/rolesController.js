@@ -1,18 +1,18 @@
-const sendResponse = require("../../../../utils/responseUtil");
-const { checkIsAdmin } = require("../../../../utils/utils");
+const sendResponse = require('../../../../utils/responseUtil');
+const { checkIsAdmin } = require('../../../../utils/utils');
 const {
   createRoleService,
   getJsonRowRoleService,
   getAllRoleService,
-} = require("../services/rolesService");
+} = require('../services/rolesService');
 
 const createRole = async (req, res) => {
   if (!checkIsAdmin)
     return sendResponse(
       res,
-      500,
-      "error",
-      "Maaf, anda tidak memiliki akses ini"
+      403,
+      'error',
+      'Maaf, anda tidak memiliki akses ini'
     );
 
   try {
@@ -22,16 +22,16 @@ const createRole = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menambahkan role",
+      'success',
+      'Berhasil menambahkan role',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal menambahkan role",
+      'error',
+      'Gagal menambahkan role',
       error.message
     );
   }
@@ -41,9 +41,9 @@ const getAllRole = async (req, res) => {
   if (!checkIsAdmin)
     return sendResponse(
       res,
-      500,
-      "error",
-      "Maaf, anda tidak memiliki akses ini"
+      403,
+      'error',
+      'Maaf, anda tidak memiliki akses ini'
     );
 
   try {
@@ -53,12 +53,12 @@ const getAllRole = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menampilkan semua role",
+      'success',
+      'Berhasil menampilkan semua role',
       result
     );
   } catch (error) {
-    return sendResponse(res, 500, "error", "gagal menampilkan semua role");
+    return sendResponse(res, 500, 'error', 'gagal menampilkan semua role');
   }
 };
 

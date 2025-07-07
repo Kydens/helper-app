@@ -34,7 +34,7 @@ const getAllUsers = async (req, res) => {
   if (!checkIsAdmin) {
     return sendResponse(
       res,
-      500,
+      403,
       'error',
       'Maaf, anda tidak memiliki akses ini!'
     );

@@ -1,22 +1,22 @@
-const jwt = require("jsonwebtoken");
-const redis = require("../config/redis");
-const sendResponse = require("../utils/responseUtil");
-const constants = require("../config/constants");
-const Users = require("../modules/auth/v1/models/s_users");
-const UserCookies = require("../modules/auth/v1/models/s_user_cookies");
+const jwt = require('jsonwebtoken');
+const redis = require('../config/redis');
+const sendResponse = require('../utils/responseUtil');
+const constants = require('../config/constants');
+const Users = require('../modules/auth/v1/models/s_users');
+const UserCookies = require('../modules/auth/v1/models/s_user_cookies');
 
 let redisAvailable = true;
 
-redis.on("error", () => (redisAvailable = false));
-redis.on("connect", () => (redisAvailable = true));
+redis.on('error', () => (redisAvailable = false));
+redis.on('connect', () => (redisAvailable = true));
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-      return sendResponse(res, 400, "error", "Token tidak ditemukan");
+      return sendResponse(res, 400, 'error', 'Token tidak ditemukan');
     }
 
     let decodedUser;
@@ -26,9 +26,9 @@ const authMiddleware = async (req, res, next) => {
     } catch (err) {
       return sendResponse(
         res,
-        400,
-        "error",
-        "Token tidak valid atau sudah kedaluwarsa"
+        401,
+        'error',
+        'Token tidak valid atau sudah kedaluwarsa'
       );
     }
 
@@ -54,7 +54,7 @@ const authMiddleware = async (req, res, next) => {
           await redis.del(redisKey);
         }
 
-        return sendResponse(res, 403, "error", "Akun anda telah dinonaktifkan");
+        return sendResponse(res, 403, 'error', 'Akun anda telah dinonaktifkan');
       }
 
       const userCookie = await UserCookies.findOne({
@@ -62,14 +62,14 @@ const authMiddleware = async (req, res, next) => {
       });
 
       if (!userCookie)
-        return sendResponse(res, 403, "error", "Session tidak valid!");
+        return sendResponse(res, 403, 'error', 'Session tidak valid!');
 
       if (!userCookie.is_active) {
         if (redisAvailable) {
           await redis.del(redisKey);
         }
 
-        return sendResponse(res, 403, "error", "Akses token dibanned");
+        return sendResponse(res, 403, 'error', 'Akses token dibanned');
       }
 
       let refreshDecoded;
@@ -79,7 +79,7 @@ const authMiddleware = async (req, res, next) => {
           constants.JWT_SECRET
         );
       } catch (refreshError) {
-        console.error("Refresh token kedaluwarsa: ", refreshError.message);
+        console.error('Refresh token kedaluwarsa: ', refreshError.message);
 
         await UserCookies.update(
           { is_active: 0 },
@@ -93,8 +93,8 @@ const authMiddleware = async (req, res, next) => {
         return sendResponse(
           res,
           403,
-          "error",
-          "Refresh token kedaluwarsa, akun dinonaktifkan. Silahkan login kembali."
+          'error',
+          'Refresh token kedaluwarsa, akun dinonaktifkan. Silahkan login kembali.'
         );
       }
 
@@ -102,7 +102,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     if (!userData.is_active) {
-      return sendResponse(res, 403, "error", "Akun anda telah dinonaktifkan");
+      return sendResponse(res, 403, 'error', 'Akun anda telah dinonaktifkan');
     }
 
     if (redisAvailable) {
@@ -119,9 +119,9 @@ const authMiddleware = async (req, res, next) => {
 
     return next();
   } catch (error) {
-    console.error("Error in authMiddleware: ", error.message);
+    console.error('Error in authMiddleware: ', error.message);
     if (!res.headersSent) {
-      return sendResponse(res, 500, "error", "Terjadi kesalahan pada server");
+      return sendResponse(res, 500, 'error', 'Terjadi kesalahan pada server');
     }
   }
 };
