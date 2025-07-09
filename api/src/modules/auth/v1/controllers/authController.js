@@ -64,6 +64,7 @@ exports.login = async (req, res) => {
     const rowUser = await getRoleByIdUserService(user.id);
     const dataSign = {
       id: user.id,
+      username: user.username,
       role_id: rowUser.roles.id,
       role_alias: rowUser.roles.alias,
       device: device,
