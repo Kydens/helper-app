@@ -1,3 +1,4 @@
+// plugins/fetch-interceptor.ts
 export default defineNuxtPlugin((nuxtApp) => {
   const accessToken = useCookie('accessToken', {
     secure: true,
@@ -5,7 +6,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     path: '/',
   });
 
-  // Override global $fetch
+  const refreshToken = useCookie('refreshToken', {
+    secure: true,
+    sameSite: 'lax',
+    path: '/',
+  });
+
   nuxtApp.hook('app:created', () => {
     nuxtApp.$fetch = $fetch.create({
       onRequest({ options }) {
@@ -17,10 +23,13 @@ export default defineNuxtPlugin((nuxtApp) => {
           };
         }
       },
-      onResponseError({ response }) {
+
+      async onResponseError({ response }) {
         if (response.status === 401) {
           accessToken.value = null;
-          return navigateTo('/login');
+          refreshToken.value = null;
+
+          window.location.href = '/login';
         }
       },
     });
