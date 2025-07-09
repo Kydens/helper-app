@@ -1,10 +1,11 @@
 const sendResponse = require('../../../../utils/responseUtil');
-const { getUserIdFromToken, checkIsAdmin } = require('../../../../utils/utils');
+const { checkIsAdmin } = require('../../../../utils/utils');
 const {
   createUserService,
   getJsonRowUserService,
   getAllUsersService,
   getUserByIdService,
+  deleteUserService,
 } = require('../services/usersService');
 
 const createUsers = async (req, res) => {
@@ -31,7 +32,7 @@ const createUsers = async (req, res) => {
 };
 
 const getAllUsers = async (req, res) => {
-  if (!checkIsAdmin) {
+  if (!checkIsAdmin(req)) {
     return sendResponse(
       res,
       403,
@@ -93,8 +94,7 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    const userId = await getUserIdFromToken(req);
-    const user = await getUserByIdService(userId);
+    const user = await getUserByIdService(req.params.id);
     const result = await getJsonRowUserService(user);
 
     return sendResponse(
@@ -115,8 +115,32 @@ const getUserById = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  if (!checkIsAdmin(req)) {
+    return sendResponse(
+      res,
+      403,
+      'error',
+      'Maaf, anda tidak memiliki akses ini!'
+    );
+  }
+  try {
+    const result = await deleteUserService(req, req.params.id);
+    return sendResponse(res, 200, 'success', 'Berhasil menghapus user', result);
+  } catch (error) {
+    return sendResponse(
+      res,
+      500,
+      'error',
+      'Gagal menghapus user',
+      error.message
+    );
+  }
+};
+
 module.exports = {
   createUsers,
   getAllUsers,
   getUserById,
+  deleteUser,
 };

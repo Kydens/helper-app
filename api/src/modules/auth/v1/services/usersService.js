@@ -6,7 +6,10 @@ const {
   insertTransaction,
   updateTransaction,
 } = require('../../../../utils/crudUtil');
-const { convertArrayToSingleJson } = require('../../../../utils/utils');
+const {
+  convertArrayToSingleJson,
+  getUserIdFromToken,
+} = require('../../../../utils/utils');
 const Users = require('../models/s_users');
 const {
   getRoleIdUserService,
@@ -42,7 +45,7 @@ const createUserService = async (req) => {
       fullname: row.username, // saat signup, fullname set dari username
       email: row.email,
       password: hashedPassword,
-      is_active: true, // sementara dibuat true yaa
+      is_active: row.isActive || false, // sementara dibuat true yaa
     };
 
     // Cek apakah ada username atau email sudah terpakai
@@ -138,6 +141,24 @@ const getUserByIdService = async (id) => {
   return rows[0];
 };
 
+const deleteUserService = async (req, id) => {
+  const now = new Date();
+  const adminUserId = getUserIdFromToken(req);
+  await Users.update(
+    {
+      is_deleted: true,
+      deleted_at: now,
+      deleted_by: adminUserId,
+    },
+    { where: { id: id }, returning: ['is_deleted', 'deleted_at', 'deleted_by'] }
+  );
+
+  return await Users.findOne({
+    where: { id: id },
+    attributes: ['id', 'username', 'is_deleted', 'is_deleted', 'deleted_at'],
+  });
+};
+
 const getJsonRowUserService = (data) => {
   const checkList = Array.isArray(data) ? 'array' : 'tunggal';
   const dataArray = Array.isArray(data) ? data : [data];
@@ -166,5 +187,6 @@ module.exports = {
   createUserService,
   getAllUsersService,
   getUserByIdService,
+  deleteUserService,
   getJsonRowUserService,
 };
