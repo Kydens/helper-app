@@ -1,11 +1,11 @@
 <template>
-  <Sidebar class="bg-sidebar text-sidebar-foreground border-r">
-    <SidebarContent>
-      <SidebarGroup>
+  <Sidebar class="bg-sidebar text-sidebar-foreground border-r min-h-screen">
+    <SidebarContent class="flex flex-col h-full">
+      <SidebarGroup class="flex flex-col h-full">
         <SidebarHeader class="px-4 py-4">
           <h1 class="text-xl font-bold tracking-wide">Helper App</h1>
         </SidebarHeader>
-        <SidebarGroupContent>
+        <SidebarGroupContent class="flex-1 overflow-auto">
           <SidebarMenu class="flex flex-col gap-1">
             <SidebarMenuItem v-for="item in items" :key="item.title">
               <NuxtLink
@@ -72,6 +72,40 @@
             </template>
           </SidebarMenu>
         </SidebarGroupContent>
+        <SidebarFooter class="py-6 px-4 flex flex-col gap-6">
+          <SidebarMenuItem>
+            <Button
+              type="submit"
+              class="mt-2 w-full transition-all duration-300 bg-blue-500 text-white hover:bg-destructive hover:cursor-pointer"
+              @click="handleLogout"
+            >
+              Logout
+            </Button>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Badge
+              variant="outline"
+              class="w-full px-6 py-3 flex justify-between transition-all duration-300 hover:bg-secondary"
+            >
+              <NuxtLink :to="`/user/${userId}`" class="block">
+                <div class="flex gap-2 items-center">
+                  <Avatar>
+                    <AvatarImage
+                      src="https://ui-avatars.com/api/?name=admin"
+                      alt="avatar-user"
+                    />
+                  </Avatar>
+                  <span>{{ username }}</span>
+                </div>
+              </NuxtLink>
+              <NuxtLink :to="`/user/settings/${userId}`" class="block">
+                <div class="flex items-center pl-4 border-l-2">
+                  <Icon name="material-symbols:settings" class="w-5 h-5" />
+                </div>
+              </NuxtLink>
+            </Badge>
+          </SidebarMenuItem>
+        </SidebarFooter>
       </SidebarGroup>
     </SidebarContent>
   </Sidebar>
@@ -80,21 +114,29 @@
 <script setup>
 import { onMounted } from 'vue';
 import { ref } from 'vue';
+import { useAuth } from '@/composables/useAuth';
+import { useUser } from '@/composables/useUser';
 import { useRole } from '@/composables/useRole';
 import { Home, ListTodo } from 'lucide-vue-next';
 import {
   Sidebar,
   SidebarHeader,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 
 const masterOpen = ref(false);
 
 const route = useRoute();
+const { $swal } = useNuxtApp();
+const { userId, username } = useUser();
 const { role } = useRole();
+const { logout } = useAuth();
 
 const toggleMasterOpen = () => {
   masterOpen.value = !masterOpen.value;
@@ -131,6 +173,42 @@ const adminItems = [
     icon: 'material-symbols:assignment-ind',
   },
 ];
+
+const handleLogout = async () => {
+  try {
+    await $swal
+      .fire({
+        title: 'Anda ingin logout?',
+        text: 'Anda akan keluar dari akun ini.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Logout',
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          $swal.fire({
+            title: 'Logout',
+            text: 'Anda berhasil logout!',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+            allowOusideCLick: false,
+          });
+
+          logout();
+          return navigateTo('/login');
+        }
+      });
+  } catch (e) {
+    await $swal.fire({
+      icon: 'error',
+      title: 'Terjadi Kesalahan!',
+      text: e?.data?.message || e.message || 'Tidak dapat login.',
+    });
+  }
+};
 </script>
 
 <style scoped>
