@@ -1,44 +1,35 @@
-import { useRuntimeConfig } from '#app';
+import { useRuntimeConfig, useNuxtApp } from '#app';
+import { useRouter } from 'vue-router';
 
-export const useApiFetch = async (url, options = {}) => {
+export const useApiFetch = () => {
   const config = useRuntimeConfig();
+  const { $fetch } = useNuxtApp();
+
   const token = useCookie('accessToken', {
     secure: true,
     sameSite: 'lax',
     path: '/',
   }).value;
 
-  try {
-    const res = await $fetch(`${config.public.apiBase}${url}`, {
-      ...options,
-      headers: {
-        ...(options.headers || {}),
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.success) {
-      throw new Error(res.message || 'Terjadi kesalahan pada server.');
-    }
-
-    return res;
-  } catch (e) {
-    if (e?.response?.status === 401) {
-      await $swal.fire({
-        icon: 'warning',
-        timer: 1000,
-        text: e?.response?._data?.message,
-        showConfirmButton: false,
+  return async (url, options = {}) => {
+    try {
+      const res = await $fetch(`${config.public.apiBase}${url}`, {
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      useCookie('accessToken').value = null;
-      useCookie('refreshToken').value = null;
-      router.push('/login');
-      return;
-    }
+      if (res?.success === false && res?.code !== 401) {
+        throw new Error(res.message || 'Terjadi kesalahan pada server.');
+      }
 
-    throw new Error(
-      e?.data?.message || e?.message || 'Terjadi kesalahan tak dikenal.'
-    );
-  }
+      return res;
+    } catch (e) {
+      throw new Error(
+        e?.data?.message || e?.message || 'Terjadi kesalahan tak dikenal.'
+      );
+    }
+  };
 };
