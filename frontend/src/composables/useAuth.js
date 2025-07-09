@@ -19,9 +19,6 @@ export const useAuth = () => {
         },
       });
 
-      const decoded = jwtDecode(res.data.accessToken);
-      const role = decoded?.role_alias || null;
-
       if (res.success) {
         useCookie('accessToken', {
           secure: true,
