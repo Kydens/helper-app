@@ -1,17 +1,23 @@
 <template>
   <Card class="w-full overflow-auto rounded border">
-    <CardHeader class="flex items-center justify-between px-6 py-2 border-b">
-      <Input
-        v-model="internalSearch"
-        @input="emit('update:search', internalSearch)"
-        type="text"
-        placeholder="Cari..."
-        class="px-2 py-1 border rounded w-full max-w-sm"
-      />
-      <Button class="ml-4" @click="emit('refresh')">
-        <Icon name="material-symbols:refresh" class="w-4 h-4 mr-1" />
-        Refresh Data
+    <CardHeader class="flex flex-col px-6 py-2 border-b gap-4">
+      <Button @click="emit('create')" v-if="canCreate">
+        <Icon name="material-symbols:add-2-rounded" class="w-4 h-4" />
+        Create
       </Button>
+      <div class="flex items-center justify-between w-full">
+        <Input
+          v-model="internalSearch"
+          @input="emit('update:search', internalSearch)"
+          type="text"
+          placeholder="Cari..."
+          class="px-2 py-1 border rounded w-full max-w-sm"
+        />
+        <Button class="ml-4" @click="emit('refresh')">
+          <Icon name="material-symbols:refresh" class="w-4 h-4 mr-1" />
+          Refresh Data
+        </Button>
+      </div>
     </CardHeader>
 
     <CardContent>
@@ -78,8 +84,9 @@
                   <Button
                     size="sm"
                     variant="outline"
-                    class="bg-chart-4"
-                    @click="emit('edit', row)"
+                    class="bg-chart-4 hover:cursor-pointer"
+                    @click="emit('edit', row.id)"
+                    v-if="canUpdate"
                   >
                     <Icon name="material-symbols:edit" class="w-4 h-4 mr-1" />
                     Edit
@@ -87,7 +94,9 @@
                   <Button
                     size="sm"
                     variant="destructive"
-                    @click="emit('delete', row)"
+                    class="hover:cursor-pointer"
+                    @click="emit('delete', row.id)"
+                    v-if="canDelete"
                   >
                     <Icon name="material-symbols:delete" class="w-4 h-4 mr-1" />
                     Hapus
@@ -170,15 +179,33 @@ const props = defineProps({
   },
   search: {
     type: String,
+    required: true,
     default: '',
   },
   sortBy: {
     type: String,
+    required: true,
     default: '',
   },
   sortOrder: {
     type: String,
+    required: true,
     default: '',
+  },
+  canCreate: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  canUpdate: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  canDelete: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
 });
 
