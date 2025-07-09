@@ -1,0 +1,38 @@
+import { useApiFetch } from '@/composables/useApiFetch';
+
+export const usersService = () => {
+  const apiFetch = useApiFetch();
+
+  const getUsers = async ({
+    page = 0,
+    search,
+    sortBy = 'created_at',
+    sortOrder = 'DESC',
+  }) => {
+    const query = new URLSearchParams();
+
+    if (page !== null) query.append('page', page);
+    if (search) query.append('search', search);
+    if (sortBy) query.append('sortBy', sortBy);
+    if (sortOrder) query.append('sortOrder', sortOrder);
+
+    const url = `/api/users?${query.toString()}`;
+    console.log(url);
+
+    return apiFetch(url, { method: 'GET' });
+  };
+
+  const detailUser = async (id) => {
+    return await apiFetch(`/api/users/${id}`, { method: 'GET' });
+  };
+
+  const updateUser = async (id) => {
+    return await apiFetch(`/api/users/${id}`, { method: 'UPDATE' });
+  };
+  
+  const deleteUser = async (id) => {
+    return await apiFetch(`/api/users/${id}`, { method: 'DELETE' });
+  };
+
+  return { getUsers, deleteUser };
+};
