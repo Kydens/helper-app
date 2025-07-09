@@ -11,6 +11,7 @@ const Users = require('../models/s_users');
 const {
   getRoleIdUserService,
 } = require('../../../master/v1/services/rolesService');
+const { Op } = require('sequelize');
 
 const tableDB = 's_users';
 
@@ -104,8 +105,10 @@ const getAllUsersService = async (
 
   if (search) {
     whereClause[Op.or] = [
-      { title: { [Op.iLike]: `%${search}%` } },
-      { description: { [Op.iLike]: `%${search}%` } },
+      { fullname: { [Op.iLike]: `%${search}%` } },
+      { username: { [Op.iLike]: `%${search}%` } },
+      { email: { [Op.iLike]: `%${search}%` } },
+      { telphone: { [Op.iLike]: `%${search}%` } },
     ];
   }
 
