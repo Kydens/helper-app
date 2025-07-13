@@ -3,10 +3,10 @@
     <h1 class="text-xl font-bold mb-4">Data Users</h1>
 
     <AppTable
-      v-if="user"
+      v-if="userData"
       :columns="columns"
-      :data="user.data"
-      :pagination="user.paging"
+      :data="userData.data"
+      :pagination="userData.paging"
       :search="search"
       :loading="loading"
       :sortBy="sortBy"
@@ -21,7 +21,7 @@
         }
       "
       @create="createData = true"
-      @edit="handleEditUser"
+      @edit="handleDetailUser"
       @delete="handleDeleteUser"
       @update:search="(v) => (search = v)"
       @update:page="(v) => (currentPage = v)"
@@ -29,11 +29,12 @@
       @update:sortOrder="(v) => (sortOrder = v)"
     />
 
+    <!-- Create User -->
     <ModalCreate
       :modalValue="createData"
       title="User"
       :formSchema="formSchema"
-      @submit="handleCreateUser"
+      @submitCreate="handleCreateUser"
       @update:modalValue="(v) => (createData = v)"
     >
       <!-- nama lengkap -->
@@ -115,6 +116,97 @@
       <FormField
         v-slot="{ componentField }"
         name="isActive"
+        defaultValue="true"
+      >
+        <FormItem>
+          <FormLabel>Status</FormLabel>
+          <FormControl>
+            <select
+              class="border px-3 py-2 rounded w-full"
+              v-bind="componentField"
+            >
+              <option value="true">Aktif</option>
+              <option value="false">Tidak Aktif</option>
+            </select>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+    </ModalCreate>
+
+    <!-- Update User -->
+    <ModalEdit
+      :modalValue="editData"
+      title="User"
+      :formSchema="formSchema"
+      :initialValues="userDetails"
+      @submitEdit="handleUpdateUser"
+      @update:modalValue="(v) => (editData = v)"
+    >
+      <!-- nama lengkap -->
+      <FormField v-slot="{ componentField }" name="fullname">
+        <FormItem>
+          <FormLabel>Fullname</FormLabel>
+          <FormControl>
+            <Input
+              type="text"
+              placeholder="fullname..."
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <!-- username -->
+      <FormField v-slot="{ componentField }" name="username">
+        <FormItem>
+          <FormLabel>Username</FormLabel>
+          <FormControl>
+            <Input
+              type="text"
+              placeholder="username..."
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <!-- email -->
+      <FormField v-slot="{ componentField }" name="email">
+        <FormItem>
+          <FormLabel>Email</FormLabel>
+          <FormControl>
+            <Input
+              type="email"
+              placeholder="email..."
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <!-- telphone -->
+      <FormField v-slot="{ componentField }" name="telphone">
+        <FormItem>
+          <FormLabel>No. Telepon (Optional)</FormLabel>
+          <FormControl>
+            <Input
+              type="text"
+              placeholder="nomor telepon..."
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <!-- status -->
+      <FormField
+        v-slot="{ componentField }"
+        name="isActive"
         :defaultValue="'true'"
       >
         <FormItem>
@@ -124,14 +216,14 @@
               class="border px-3 py-2 rounded w-full"
               v-bind="componentField"
             >
-              <option :value="'true'">Aktif</option>
-              <option :value="'false'">Tidak Aktif</option>
+              <option value="true">Aktif</option>
+              <option value="false">Tidak Aktif</option>
             </select>
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
-    </ModalCreate>
+    </ModalEdit>
   </div>
 </template>
 
@@ -154,12 +246,16 @@ import {
 import { Input } from '@/components/ui/input';
 import AppTable from '@/components/organisms/AppTable.vue';
 import ModalCreate from '@/components/organisms/AppModals/ModalCreate.vue';
+import ModalEdit from '@/components/organisms/AppModals/ModalEdit.vue';
 
 const { isActiveRender } = functionHelper();
-const { createUser, getUsers, deleteUser } = usersService();
+const { createUser, getUsers, getDetailUser, updateUser, deleteUser } =
+  usersService();
 const { $swal } = useNuxtApp();
+
 const loading = ref(true);
-const user = ref(null);
+const userData = ref(null);
+const userDetails = ref({});
 
 const search = ref('');
 const currentPage = ref(0);
@@ -167,6 +263,7 @@ const sortBy = ref('created_at');
 const sortOrder = ref('DESC');
 
 const createData = ref(false);
+const editData = ref(false);
 
 const columns = [
   { key: '__no', label: '#', sortable: true },
@@ -188,12 +285,12 @@ const columns = [
 
 const formSchema = toTypedSchema(
   z.object({
-    fullname: z.string().optional(),
+    fullname: z.string().nullable(),
     username: z.string().min(4, 'Minimal 4 karaker!').max(255),
     email: z.string().email(),
-    password: z.string().min(8, 'Minimal 8 karakter'),
-    telphone: z.string().optional(),
-    isActive: z.enum(['true', 'false']).transform((val) => val === 'true'),
+    password: z.string().min(8, 'Minimal 8 karakter').optional(),
+    telphone: z.string().nullable(),
+    isActive: z.enum(['true', 'false']),
   })
 );
 
@@ -208,7 +305,8 @@ const handleCreateUser = async (values) => {
     $swal
       .fire({
         icon: 'success',
-        title: result.message || 'Berhasil menambahkan data',
+        title: 'Berhasil!',
+        text: result.message || 'Berhasil menambahkan data',
         showConfirmButton: false,
         timer: 1000,
       })
@@ -227,7 +325,7 @@ const handleCreateUser = async (values) => {
 const handleGetUsers = async () => {
   loading.value = true;
   try {
-    user.value = await getUsers({
+    userData.value = await getUsers({
       page: currentPage.value,
       search: search.value,
       sortBy: sortBy.value,
@@ -244,8 +342,52 @@ const handleGetUsers = async () => {
   }
 };
 
-const handleEditUser = (id) => {
-  console.log('Edit user:', id);
+const handleDetailUser = async (id) => {
+  try {
+    const detail = await getDetailUser(id);
+    userDetails.value = JSON.parse(
+      JSON.stringify({
+        ...detail.data,
+        isActive: detail.data.isActive ? 'true' : 'false',
+      })
+    );
+    editData.value = true;
+  } catch (e) {
+    await $swal.fire({
+      icon: 'error',
+      title: 'Gagal Mengambil Data',
+      text: e.message || 'Terjadi kesalahan tidak diketahui',
+    });
+  }
+};
+
+const handleUpdateUser = async (values) => {
+  try {
+    const id = values.id;
+    const result = await updateUser(values, id);
+
+    if (!result.success) throw new Error(result.message || 'Gagal mengupdate');
+
+    editData.value = false;
+
+    $swal
+      .fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: result.message || 'Berhasil mengupdate data',
+        showConfirmButton: false,
+        timer: 1000,
+      })
+      .then(async () => {
+        await handleGetUsers();
+      });
+  } catch (e) {
+    await $swal.fire({
+      icon: 'error',
+      title: 'Gagal mengupdate data',
+      text: e.message || 'Terjadi kesalahan tidak diketahui',
+    });
+  }
 };
 
 const handleDeleteUser = async (id) => {
@@ -261,17 +403,18 @@ const handleDeleteUser = async (id) => {
     try {
       await deleteUser(id);
       await handleGetUsers();
-      $swal.fire('Berhasil!', 'Data berhasil dihapus.', 'success');
+      $swal.fire({
+        title: 'Berhasil!',
+        text: 'Data berhasil dihapus.',
+        icon: 'success',
+        timer: 1000,
+        confirmButtonText: false,
+      });
     } catch (e) {
       $swal.fire('Gagal menghapus data', e.message, 'error');
     }
   }
 };
-
-console.log({
-  currentSortKey: sortBy.value,
-  currentSortOrder: sortOrder.value,
-});
 
 let debounceTimeout;
 watch(

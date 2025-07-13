@@ -29,17 +29,21 @@ export const usersService = () => {
     return apiFetch(url, { method: 'GET' });
   };
 
-  const detailUser = async (id) => {
+  const getDetailUser = async (id) => {
     return await apiFetch(`/api/users/${id}`, { method: 'GET' });
   };
 
-  const updateUser = async (id) => {
-    return await apiFetch(`/api/users/${id}`, { method: 'UPDATE' });
+  const updateUser = async (payload, id) => {
+    const url = `/api/users/${id}`;
+    return await apiFetch(url, {
+      method: 'PUT',
+      body: payload,
+    });
   };
 
   const deleteUser = async (id) => {
     return await apiFetch(`/api/users/${id}`, { method: 'DELETE' });
   };
 
-  return { createUser, getUsers, deleteUser };
+  return { createUser, getUsers, getDetailUser, updateUser, deleteUser };
 };
