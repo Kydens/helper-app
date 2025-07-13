@@ -15,6 +15,7 @@ const {
   getRoleIdUserService,
 } = require('../../../master/v1/services/rolesService');
 const { Op } = require('sequelize');
+const sequelize = require('../../../../config/sequelize');
 
 const tableDB = 's_users';
 
@@ -26,6 +27,13 @@ const createUserService = async (req) => {
 
   try {
     await client.query('BEGIN');
+
+    let fullname = null;
+    if (!row.fullname) {
+      fullname = row.username;
+    } else {
+      fullname = row.fullname;
+    }
 
     let hashedPassword = null;
     if (row.password) {
@@ -42,10 +50,10 @@ const createUserService = async (req) => {
       id: generateUUID(),
       created_at: now,
       username: row.username,
-      fullname: row.username, // saat signup, fullname set dari username
+      fullname: fullname,
       email: row.email,
       password: hashedPassword,
-      is_active: row.isActive || false, // sementara dibuat true yaa
+      is_active: row.isActive || false,
     };
 
     // Cek apakah ada username atau email sudah terpakai
@@ -131,14 +139,56 @@ const getAllUsersService = async (
   return { data: rows, total: count };
 };
 
-const getUserByIdService = async (id) => {
-  let query = `
-      SELECT * FROM ${tableDB}
-      WHERE id = $1
-    `;
+const getUserByIdService = async (id, transaction = null) => {
+  const user = Users.findOne({
+    where: { id: id, is_deleted: false },
+    transaction,
+  });
 
-  const { rows } = await pool.query(query, [id]);
-  return rows[0];
+  if (!user) {
+    throw new Error('User tidak ditemukan');
+  }
+
+  return user;
+};
+
+const updateUserService = async (req, id) => {
+  const userId = req.user.id;
+  console.log(req.user);
+  const now = new Date();
+  const row = req.body;
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    let fullname = null;
+    if (!row.fullname) {
+      fullname = row.username;
+    } else {
+      fullname = row.fullname;
+    }
+
+    const rowDataUser = {
+      updated_at: now,
+      updated_by: userId,
+      username: row.username,
+      fullname: fullname,
+      email: row.email,
+      is_active: row.isActive || false,
+    };
+
+    await Users.update(rowDataUser, { where: { id: id }, transaction });
+
+    const getList = await getUserByIdService(id, transaction);
+    await transaction.commit();
+
+    return getList;
+  } catch (error) {
+    await transaction.rollback();
+    console.log('Error in update user service: ', error.message);
+    throw error;
+  }
 };
 
 const deleteUserService = async (req, id) => {
@@ -187,6 +237,7 @@ module.exports = {
   createUserService,
   getAllUsersService,
   getUserByIdService,
+  updateUserService,
   deleteUserService,
   getJsonRowUserService,
 };

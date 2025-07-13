@@ -5,6 +5,7 @@ const {
   getJsonRowUserService,
   getAllUsersService,
   getUserByIdService,
+  updateUserService,
   deleteUserService,
 } = require('../services/usersService');
 
@@ -115,6 +116,29 @@ const getUserById = async (req, res) => {
   }
 };
 
+const updateUsers = async (req, res) => {
+  try {
+    const user = await updateUserService(req, req.params.id);
+    const result = await getJsonRowUserService(user);
+
+    return sendResponse(
+      res,
+      200,
+      'success',
+      'Berhasil mengupdate akun user',
+      result
+    );
+  } catch (error) {
+    return sendResponse(
+      res,
+      400,
+      'error',
+      'Gagal mengupdate akun user',
+      error.message
+    );
+  }
+};
+
 const deleteUser = async (req, res) => {
   if (!checkIsAdmin(req)) {
     return sendResponse(
@@ -142,5 +166,6 @@ module.exports = {
   createUsers,
   getAllUsers,
   getUserById,
+  updateUsers,
   deleteUser,
 };
