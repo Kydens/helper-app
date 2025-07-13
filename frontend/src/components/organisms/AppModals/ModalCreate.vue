@@ -1,7 +1,7 @@
 <template>
   <Form
     v-slot="{ handleSubmit }"
-    as=""
+    as="form"
     keep-values
     :validation-schema="formSchema"
   >
@@ -14,9 +14,9 @@
           <DialogTitle class="font-bold">Tambah {{ title }}</DialogTitle>
         </DialogHeader>
 
-        <form id="submitForm" class="flex flex-col gap-4 px-2 overflow-y-auto">
+        <div id="submitForm" class="flex flex-col gap-4 px-2 overflow-y-auto">
           <slot />
-        </form>
+        </div>
 
         <DialogFooter>
           <DialogClose as-child>
@@ -69,10 +69,10 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modalValue', 'submit']);
+const emit = defineEmits(['update:modalValue', 'submitCreate']);
 
 const handleSubmitForm = (values) => {
-  emit('submit', values);
+  emit('submitCreate', values);
   emit('update:modalValue', false);
 };
 </script>
