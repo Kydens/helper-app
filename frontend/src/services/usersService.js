@@ -4,7 +4,7 @@ export const usersService = () => {
   const apiFetch = useApiFetch();
 
   const createUser = async (payload) => {
-    const url = '/api/users';
+    const url = '/api/master/users';
     return await apiFetch(url, {
       method: 'POST',
       body: payload,
@@ -24,17 +24,17 @@ export const usersService = () => {
     if (sortBy) query.append('sortBy', sortBy);
     if (sortOrder) query.append('sortOrder', sortOrder);
 
-    const url = `/api/users?${query.toString()}`;
+    const url = `/api/master/users?${query.toString()}`;
 
     return apiFetch(url, { method: 'GET' });
   };
 
   const getDetailUser = async (id) => {
-    return await apiFetch(`/api/users/${id}`, { method: 'GET' });
+    return await apiFetch(`/api/master/users/${id}`, { method: 'GET' });
   };
 
   const updateUser = async (payload, id) => {
-    const url = `/api/users/${id}`;
+    const url = `/api/master/users/${id}`;
     return await apiFetch(url, {
       method: 'PUT',
       body: payload,
@@ -42,7 +42,7 @@ export const usersService = () => {
   };
 
   const deleteUser = async (id) => {
-    return await apiFetch(`/api/users/${id}`, { method: 'DELETE' });
+    return await apiFetch(`/api/master/users/${id}`, { method: 'DELETE' });
   };
 
   return { createUser, getUsers, getDetailUser, updateUser, deleteUser };
