@@ -1,8 +1,8 @@
-const { Op } = require("sequelize");
-const sequelize = require("../../../../config/sequelize");
-const { convertArrayToSingleJson } = require("../../../../utils/utils");
-const generateUUID = require("../../../../utils/uuidUtil");
-const Todolist = require("../models/f_todolist");
+const { Op } = require('sequelize');
+const sequelize = require('../../../../config/sequelize');
+const { convertArrayToSingleJson } = require('../../../../utils/utils');
+const generateUUID = require('../../../../utils/uuidUtil');
+const Todolist = require('../models/f_todolist');
 
 const createTodolistService = async (req) => {
   const userId = req.user.id;
@@ -33,7 +33,7 @@ const createTodolistService = async (req) => {
     if (transaction) {
       await transaction.rollback();
     }
-    console.log("Error in create todolist service: ", error.message);
+    console.log('Error in create todolist service: ', error.message);
     throw error;
   }
 };
@@ -42,9 +42,9 @@ const getAllTodolistService = async (
   userId,
   size,
   offset,
-  search = "",
-  sortBy = "created_at",
-  sortOrder = "DESC",
+  search = '',
+  sortBy = 'created_at',
+  sortOrder = 'DESC',
   startDate,
   endDate
 ) => {
@@ -86,7 +86,7 @@ const getTodolistByIdService = async (id, transaction = null) => {
   });
 
   if (!todolist) {
-    throw new Error("Todolist tidak ditemukan");
+    throw new Error('Todolist tidak ditemukan');
   }
 
   return todolist;
@@ -104,7 +104,7 @@ const updateTodolistService = async (req, id) => {
     const dataTodo = {
       updated_at: now,
       updated_by: userId,
-      is_active: true,
+      is_active: row.isActive,
       user_id: userId,
       name: row.name,
       description: row.description,
@@ -119,7 +119,7 @@ const updateTodolistService = async (req, id) => {
     return getList;
   } catch (error) {
     await transaction.rollback();
-    console.log("Error in update todolist service: ", error.message);
+    console.log('Error in update todolist service: ', error.message);
     throw error;
   }
 };
@@ -134,12 +134,12 @@ const deleteTodolistService = async (req, id) => {
 
   return Todolist.findOne({
     where: { id: id },
-    attributes: ["id", "title", "is_deleted", "is_deleted", "deleted_at"],
+    attributes: ['id', 'title', 'is_deleted', 'is_deleted', 'deleted_at'],
   });
 };
 
 const getJsonRowTodolistService = (data) => {
-  const checkList = Array.isArray(data) ? "array" : "single";
+  const checkList = Array.isArray(data) ? 'array' : 'single';
   const dataArray = Array.isArray(data) ? data : [data];
 
   const json = dataArray.map((row) => ({
@@ -153,7 +153,7 @@ const getJsonRowTodolistService = (data) => {
     level: row.level,
   }));
 
-  if (checkList == "array") {
+  if (checkList == 'array') {
     return json;
   } else {
     return convertArrayToSingleJson(json);

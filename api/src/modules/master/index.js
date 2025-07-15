@@ -1,10 +1,10 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const authMiddleware = require("../../middleware/authMiddleware");
+const authMiddleware = require('../../middleware/authMiddleware');
 
-const roleRoutes = require("./v1/routes/roleRoutes");
+const roleRoutes = require('./v1/routes/roleRoutes');
 
-router.use("/master/role", authMiddleware, roleRoutes);
+router.use('/master/roles', authMiddleware, roleRoutes);
 
 module.exports = router;
