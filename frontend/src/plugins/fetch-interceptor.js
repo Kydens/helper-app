@@ -1,4 +1,3 @@
-// plugins/fetch-interceptor.ts
 export default defineNuxtPlugin((nuxtApp) => {
   const accessToken = useCookie('accessToken', {
     secure: true,
