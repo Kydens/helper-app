@@ -7,13 +7,11 @@ const {
   convertArrayToSingleJson,
 } = require('../../../../utils/utils');
 const generateUUID = require('../../../../utils/uuidUtil');
-const { insertTransaction } = require('../../../../utils/crudUtil');
 const sequelize = require('../../../../config/sequelize');
 
 let tableDB = 's_roles';
 
 const createRoleService = async (req) => {
-  const client = await pool.connect();
   const userId = req.user.id;
   const now = new Date();
   const row = req.body;
@@ -34,10 +32,10 @@ const createRoleService = async (req) => {
 
     let alias = await generateAlias(rowDataRole.alias);
     rowDataRole.alias = alias;
-    const checkAlias = await getCheckAlias(client, tableDB, alias);
+    const checkAlias = await getCheckAlias(Roles, alias);
 
     if (checkAlias) {
-      let newAlias = await generateNewAlias(client, tableDB, rowDataRole.alias);
+      let newAlias = await generateNewAlias(Roles, rowDataRole.alias);
       rowDataRole.alias = newAlias;
     }
 
