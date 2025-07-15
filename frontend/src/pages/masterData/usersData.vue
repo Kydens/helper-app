@@ -302,7 +302,7 @@ const handleCreateUser = async (values) => {
 
     createData.value = false;
 
-    $swal
+    await $swal
       .fire({
         icon: 'success',
         title: 'Berhasil!',
@@ -370,7 +370,7 @@ const handleUpdateUser = async (values) => {
 
     editData.value = false;
 
-    $swal
+    await $swal
       .fire({
         icon: 'success',
         title: 'Berhasil!',
