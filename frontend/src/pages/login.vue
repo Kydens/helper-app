@@ -100,8 +100,6 @@ const account = ref('');
 const password = ref('');
 const showPassword = ref(false);
 
-console.log(showPassword);
-
 const handleLogin = async () => {
   try {
     await $swal.fire({

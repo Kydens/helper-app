@@ -153,11 +153,6 @@ const handleSignup = async () => {
     });
 
     await signup(username.value, email.value, password.value);
-    console.log({
-      username: username.value,
-      email: email.value,
-      password: password.value,
-    });
 
     await $swal.fire({
       icon: 'success',

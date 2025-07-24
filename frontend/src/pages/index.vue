@@ -64,7 +64,6 @@ onMounted(async () => {
     const data = await $fetch(`${config.public.apiBase}`);
     apiMessage.value = data.message;
   } catch (err) {
-    console.error(err);
     apiMessage.value = 'Gagal mengambil data dari API.';
   }
 });
