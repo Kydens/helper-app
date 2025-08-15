@@ -1,8 +1,8 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../../../../config/sequelize");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../../../config/sequelize');
 
 const Todolist = sequelize.define(
-  "f_todolist",
+  'f_todolist',
   {
     id: {
       type: DataTypes.STRING(36),
@@ -38,10 +38,10 @@ const Todolist = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
-    is_active: {
+    is_finish: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true,
+      defaultValue: false,
     },
     user_id: {
       type: DataTypes.STRING(36),
@@ -57,17 +57,21 @@ const Todolist = sequelize.define(
     },
     level: {
       type: DataTypes.ENUM(
-        "Sangat Penting",
-        "Cukup Penting",
-        "Penting",
-        "Tidak Penting"
+        'Sangat Penting',
+        'Cukup Penting',
+        'Penting',
+        'Tidak Penting'
       ),
       allowNull: false,
-      defaultValue: "Penting",
+      defaultValue: 'Penting',
+    },
+    due_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
   },
   {
-    tableName: "f_todolist",
+    tableName: 'f_todolist',
     timestamps: false,
   }
 );

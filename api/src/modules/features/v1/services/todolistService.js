@@ -17,11 +17,12 @@ const createTodolistService = async (req) => {
       id: generateUUID(),
       created_at: now,
       created_by: userId,
-      is_active: true,
+      is_finish: row.isFinish,
       user_id: userId,
       title: row.title,
       description: row.description,
       level: row.level,
+      due_date: row.dueDate,
     };
 
     const rowTodolist = await Todolist.create(dataTodo, { transaction });
@@ -43,6 +44,7 @@ const getAllTodolistService = async (
   size,
   offset,
   search = '',
+  level = '',
   sortBy = 'created_at',
   sortOrder = 'DESC',
   startDate,
@@ -61,6 +63,10 @@ const getAllTodolistService = async (
       { title: { [Op.iLike]: `%${search}%` } },
       { description: { [Op.iLike]: `%${search}%` } },
     ];
+  }
+
+  if (level) {
+    whereClause.level = level;
   }
 
   if (startDate && endDate) {
@@ -104,11 +110,12 @@ const updateTodolistService = async (req, id) => {
     const dataTodo = {
       updated_at: now,
       updated_by: userId,
-      is_active: row.isActive,
+      is_finish: row.isFinish,
       user_id: userId,
       name: row.name,
       description: row.description,
       level: row.level,
+      due_date: row.dueDate,
     };
 
     await Todolist.update(dataTodo, { where: { id: id }, transaction });
@@ -134,7 +141,7 @@ const deleteTodolistService = async (req, id) => {
 
   return Todolist.findOne({
     where: { id: id },
-    attributes: ['id', 'title', 'is_deleted', 'is_deleted', 'deleted_at'],
+    attributes: ['id', 'title', 'is_deleted', 'deleted_at', 'deleted_by'],
   });
 };
 
@@ -146,11 +153,12 @@ const getJsonRowTodolistService = (data) => {
     id: row.id,
     createdAt: row.created_at,
     createdBy: row.created_by,
-    isActive: row.is_active,
+    isFinish: row.is_finish,
     userId: row.user_id,
     title: row.title,
     description: row.description,
     level: row.level,
+    dueDate: row.due_date,
   }));
 
   if (checkList == 'array') {
