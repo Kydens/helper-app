@@ -33,5 +33,16 @@ export const functionHelper = () => {
     }
   };
 
-  return { isActiveRender };
+  const camelCase = (str) => {
+    const words = str.split(' ');
+    const capitalizeWords = words
+      .map((word) => {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join('');
+
+    return capitalizeWords.charAt(0).toLowerCase() + capitalizeWords.slice(1);
+  };
+
+  return { isActiveRender, camelCase };
 };
