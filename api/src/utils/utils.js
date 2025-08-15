@@ -2,12 +2,12 @@ const jwt = require('jsonwebtoken');
 const constants = require('../config/constants');
 const { where } = require('sequelize');
 
-const isNotEmpty = (variable) => {
-  return variable !== null && variable !== undefined && variable !== '';
+const isNotEmpty = (value) => {
+  return value !== null && value !== undefined && value !== '';
 };
 
-const isEmptyString = (variable) => {
-  return typeof variable === 'string' && variable.trim() === '';
+const isEmptyString = (value) => {
+  return typeof value === 'string' && value.trim() === '';
 };
 
 const convertArrayToSingleJson = (dataArray) => {
