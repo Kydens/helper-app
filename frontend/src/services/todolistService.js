@@ -2,9 +2,10 @@ import { useApiFetch } from '@/composables/useApiFetch';
 
 export const todolistService = () => {
   const apiFetch = useApiFetch();
+  const urlApi = '/api/features/todolist';
 
   const createTodolist = async (payload) => {
-    const url = '/api/features/todolist';
+    const url = `${urlApi}`;
     return await apiFetch(url, {
       method: 'POST',
       body: payload,
@@ -28,17 +29,17 @@ export const todolistService = () => {
     if (sortBy) query.append('sortBy', sortBy);
     if (sortOrder) query.append('sortOrder', sortOrder);
 
-    const url = `/api/features/todolist?${query.toString()}`;
+    const url = `${urlApi}?${query.toString()}`;
 
     return apiFetch(url, { method: 'GET' });
   };
 
   const getDetailTodolist = async (id) => {
-    return await apiFetch(`/api/features/todolist/${id}`, { method: 'GET' });
+    return await apiFetch(`${urlApi}/${id}`, { method: 'GET' });
   };
 
   const updateTodolist = async (payload, id) => {
-    const url = `/api/features/todolist/${id}`;
+    const url = `${urlApi}/${id}`;
     return await apiFetch(url, {
       method: 'PUT',
       body: payload,
@@ -46,7 +47,15 @@ export const todolistService = () => {
   };
 
   const deleteTodolist = async (id) => {
-    return await apiFetch(`/api/features/todolist/${id}`, { method: 'DELETE' });
+    return await apiFetch(`${urlApi}/${id}`, { method: 'DELETE' });
+  };
+
+  const getTodolistFinish = async (payload, id) => {
+    const url = `${urlApi}/finish/${id}`;
+    return await apiFetch(url, {
+      method: 'PUT',
+      body: payload,
+    });
   };
 
   return {
@@ -55,5 +64,6 @@ export const todolistService = () => {
     getDetailTodolist,
     updateTodolist,
     deleteTodolist,
+    getTodolistFinish,
   };
 };

@@ -1,5 +1,5 @@
-const sendResponse = require("../../../../utils/responseUtil");
-const { checkIsAdmin } = require("../../../../utils/utils");
+const sendResponse = require('../../../../utils/responseUtil');
+const { checkIsAdmin } = require('../../../../utils/utils');
 const {
   getAllTodolistService,
   createTodolistService,
@@ -7,7 +7,8 @@ const {
   getJsonRowTodolistService,
   deleteTodolistService,
   getTodolistByIdService,
-} = require("../services/todolistService");
+  getTodolistFinishService,
+} = require('../services/todolistService');
 
 const createTodolist = async (req, res) => {
   try {
@@ -17,16 +18,16 @@ const createTodolist = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menambahkan todolist",
+      'success',
+      'Berhasil menambahkan todolist',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal menambahkan todolist",
+      'error',
+      'Gagal menambahkan todolist',
       error.message
     );
   }
@@ -43,9 +44,10 @@ const getAllTodolist = async (req, res) => {
     const {
       size = 10,
       page = 0,
-      search = "",
-      sortBy = "created_at",
-      sortOrder = "DESC",
+      search = '',
+      level = '',
+      sortBy = 'created_at',
+      sortOrder = 'DESC',
       startDate,
       endDate,
     } = req.query;
@@ -56,6 +58,7 @@ const getAllTodolist = async (req, res) => {
       size,
       offset,
       search,
+      level,
       sortBy,
       sortOrder,
       startDate,
@@ -69,8 +72,8 @@ const getAllTodolist = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menampilkan semua todolist",
+      'success',
+      'Berhasil menampilkan semua todolist',
       {
         data: result,
         paging: {
@@ -85,8 +88,8 @@ const getAllTodolist = async (req, res) => {
     return sendResponse(
       res,
       500,
-      "error",
-      "Gagal menampilkan semua todolist",
+      'error',
+      'Gagal menampilkan semua todolist',
       error.message
     );
   }
@@ -100,16 +103,16 @@ const getTodolistById = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menampilkan todolist",
+      'success',
+      'Berhasil menampilkan todolist',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal menampilkan todolist",
+      'error',
+      'Gagal menampilkan todolist',
       error.message
     );
   }
@@ -123,16 +126,16 @@ const updateTodolist = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil mengupdate todolist",
+      'success',
+      'Berhasil mengupdate todolist',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal mengupdate todolist",
+      'error',
+      'Gagal mengupdate todolist',
       error.message
     );
   }
@@ -145,17 +148,39 @@ const deleteTodolist = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menghapus todolist",
+      'success',
+      'Berhasil menghapus todolist',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal menghapus todolist",
+      'error',
+      'Gagal menghapus todolist',
       error.message
+    );
+  }
+};
+
+const getTodolistFinish = async (req, res) => {
+  try {
+    const todolist = await getTodolistFinishService(req, req.params.id);
+
+    return sendResponse(
+      res,
+      200,
+      'success',
+      'Berhasil update status todolist',
+      todolist
+    );
+  } catch (error) {
+    return sendResponse(
+      res,
+      400,
+      'error',
+      'Gagal update status todolist',
+      todolist
     );
   }
 };
@@ -166,4 +191,5 @@ module.exports = {
   getTodolistById,
   updateTodolist,
   deleteTodolist,
+  getTodolistFinish,
 };

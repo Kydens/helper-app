@@ -31,14 +31,14 @@
       </div>
 
       <div v-else class="p-4 rounded-xl flex-col h-full" :class="bgCardSoft">
-        <template v-for="(item, index) in data" :key="item.id">
+        <template v-for="(item, index) in data.slice(0, 3)" :key="item.id">
           <div class="flex items-start space-x-2 w-full cursor-pointer">
             <div class="pt-0.5">
               <Checkbox
                 :id="`${item.id}`"
                 v-model="item.isFinish"
                 @update:modelValue="
-                  (val) => emit('finish', { id: item.id, isFinish: val })
+                  (val) => emit('finish', { values: item.id, isFinish: val })
                 "
                 class="border-ring hover:cursor-pointer focus:ring-0"
               />

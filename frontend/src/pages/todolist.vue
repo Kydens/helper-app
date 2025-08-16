@@ -25,7 +25,7 @@ import AppCardTodo from '@/components/organisms/AppCardTodo.vue';
 
 import { todolistService } from '@/services/todolistService';
 
-const { getTodolists } = todolistService();
+const { getTodolists, getTodolistFinish } = todolistService();
 const { $swal } = useNuxtApp();
 
 const loading = ref(true);
@@ -76,11 +76,35 @@ const handleGetTodolists = async (levelParams) => {
   }
 };
 
-const handleFinishTodolist = ({ id, isFinish }) => {
+const handleFinishTodolist = ({ values, isFinish }) => {
   clearTimeout(finishTimeout);
-  finishTimeout = setTimeout(() => {
-    console.log('Updated Todo:', id, isFinish);
-    // service disini
+  finishTimeout = setTimeout(async () => {
+    console.log('Updated Todo:', values, isFinish);
+    try {
+      const id = values;
+      const result = await getTodolistFinish({ isFinish }, id);
+
+      if (!result.success)
+        throw new Error(result.message || 'Gagal mengupdate');
+
+      await $swal
+        .fire({
+          icon: 'success',
+          title: 'Berhasil!',
+          text: result.message || 'Berhasil mengupdate data',
+          showConfirmButton: false,
+          timer: 1000,
+        })
+        .then(async () => {
+          await handleGetTodolists();
+        });
+    } catch (e) {
+      await $swal.fire({
+        icon: 'error',
+        title: 'Gagal mengupdate data',
+        text: e.message || 'Terjadi kesalahan tidak diketahui',
+      });
+    }
   }, 1000);
 };
 

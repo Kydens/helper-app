@@ -145,6 +145,44 @@ const deleteTodolistService = async (req, id) => {
   });
 };
 
+const getTodolistFinishService = async (req, id) => {
+  const userId = req.user.id;
+  const row = req.body;
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    const whereClause = {
+      id: id,
+      is_deleted: false,
+    };
+
+    if (req.user.role !== 'ADMIN') {
+      whereClause.user_id = userId;
+    }
+
+    const todolist = await Todolist.update(
+      { is_finish: row.isFinish },
+      { where: whereClause, transaction }
+    );
+
+    if (!todolist) {
+      throw new Error('Todolist tidak ditemukan atau sudah selesai');
+    }
+
+    await transaction.commit();
+    return Todolist.findOne({
+      where: { id: id },
+      attributes: ['id', 'level', 'is_finish'],
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.log('Error in get todolist finish service: ', error.message);
+    throw error;
+  }
+};
+
 const getJsonRowTodolistService = (data) => {
   const checkList = Array.isArray(data) ? 'array' : 'single';
   const dataArray = Array.isArray(data) ? data : [data];
@@ -174,5 +212,6 @@ module.exports = {
   getTodolistByIdService,
   updateTodolistService,
   deleteTodolistService,
+  getTodolistFinishService,
   getJsonRowTodolistService,
 };
