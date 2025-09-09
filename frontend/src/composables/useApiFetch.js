@@ -15,8 +15,10 @@ export const useApiFetch = () => {
     try {
       const res = await $fetch(`${config.public.apiBase}${url}`, {
         ...options,
+        credentials: 'include',
         headers: {
           ...(options.headers || {}),
+          'ngrok-skip-browser-warning': 'true',
           Authorization: `Bearer ${token}`,
         },
       });

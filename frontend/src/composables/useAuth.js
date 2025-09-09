@@ -8,6 +8,7 @@ export const useAuth = () => {
     try {
       const res = await $fetch(`${config.public.apiBase}/api/auth/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           'User-Agent': navigator.userAgent,
