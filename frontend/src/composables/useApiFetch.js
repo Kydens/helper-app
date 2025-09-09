@@ -17,7 +17,8 @@ export const useApiFetch = () => {
         ...options,
         credentials: 'include',
         headers: {
-          'User-Agent': 'Helper-App-Client',
+          'Content-Type': 'application/json',
+          'User-Agent': navigator.userAgent,
           'ngrok-skip-browser-warning': 'true',
           Authorization: `Bearer ${token}`,
           ...(options.headers || {}),
