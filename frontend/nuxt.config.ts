@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   srcDir: 'src/',
   runtimeConfig: {
     public: {
-      apiBase: process.env.URL_API || 'https://131d527a8c11.ngrok-free.app',
+      apiBase: process.env.URL_API || 'https://f61ff888ae19.ngrok-free.app',
     },
   },
   css: ['~/assets/css/main.css'],
