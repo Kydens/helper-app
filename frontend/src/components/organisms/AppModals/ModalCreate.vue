@@ -4,6 +4,7 @@
     as="form"
     keep-values
     :validation-schema="formSchema"
+    :initial-values="initialValues"
   >
     <Dialog
       :open="modalValue"
@@ -51,6 +52,7 @@ import {
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
+import { useForm } from 'vee-validate';
 
 const props = defineProps({
   modalValue: {
@@ -67,9 +69,17 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  initialValues: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const emit = defineEmits(['update:modalValue', 'submitCreate']);
+
+const { handleSubmit, resetForm } = useForm({
+  initialValues: props.initialValues,
+});
 
 const handleSubmitForm = (values) => {
   emit('submitCreate', values);

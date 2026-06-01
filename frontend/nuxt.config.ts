@@ -5,11 +5,11 @@ export default defineNuxtConfig({
   srcDir: 'src/',
   runtimeConfig: {
     public: {
-      apiBase: process.env.URL_API || 'https://f61ff888ae19.ngrok-free.app',
+      apiBase: process.env.URL_API,
     },
   },
   css: ['~/assets/css/main.css'],
-  modules: ['shadcn-nuxt', '@nuxt/icon'],
+  modules: ['shadcn-nuxt', '@nuxt/icon', '@pinia/nuxt'],
   icon: {
     mode: 'css',
     cssLayer: 'base',

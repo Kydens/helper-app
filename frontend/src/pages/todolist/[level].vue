@@ -1,73 +1,62 @@
 <template>
   <div class="p-4">
-    <h1 class="text-xl font-bold mb-4">Data Roles</h1>
+    <NuxtLink v-if="parentRoute" :to="parentRoute">
+      <Button variant="default">
+        <Icon name="material-symbols:arrow-left-alt-rounded" class="w-5 h-5" />
+        Kembali
+      </Button>
+    </NuxtLink>
+    <h1 class="text-xl font-bold my-4">Todolist {{ levelTitle }}</h1>
 
+    <!-- Table Level Todo -->
     <AppTable
-      v-if="roleData"
+      v-if="todoData"
       :columns="columns"
-      :data="roleData.data"
-      :pagination="roleData.paging"
+      :data="todoData.data"
+      :pagination="todoData.paging"
       :search="search"
       :loading="loading"
       :sortBy="sortBy"
       :sortOrder="sortOrder"
-      :canCreate="true"
-      :canUpdate="true"
-      :canDelete="true"
       @refresh="
         () => {
           currentPage = 0;
-          handleGetRoles();
+          handleGetTodolists();
         }
       "
       @create="createData = true"
-      @edit="handleDetailRole"
-      @delete="handleDeleteRole"
+      @edit="handleDetailTodo"
+      @delete="handleDeleteTodo"
+      :canCreate="true"
+      :canUpdate="true"
+      :canDelete="true"
       @update:search="(v) => (search = v)"
       @update:page="(v) => (currentPage = v)"
       @update:sortBy="(v) => (sortBy = v)"
       @update:sortOrder="(v) => (sortOrder = v)"
     />
 
-    <!-- Create Role -->
+    <!-- Create Todo -->
     <ModalCreate
       :modalValue="createData"
-      title="Role"
+      title="Todolist"
       :formSchema="formSchema"
-      @submitCreate="handleCreateRole"
+      :initialValues="{ level: levelTitle, isFinish: 'false' }"
+      @submitCreate="handleCreateTodo"
       @update:modalValue="(v) => (createData = v)"
     >
-      <!-- nama role -->
-      <FormField v-slot="{ componentField }" name="name">
+      <!-- title -->
+      <FormField v-slot="{ componentField }" name="title">
         <FormItem>
-          <FormLabel>Nama Role</FormLabel>
+          <FormLabel>Judul</FormLabel>
           <FormControl>
-            <Input
-              type="text"
-              placeholder="nama role..."
-              v-bind="componentField"
-            />
+            <Input type="text" placeholder="title..." v-bind="componentField" />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
 
-      <!-- alias -->
-      <FormField v-slot="{ componentField }" name="alias">
-        <FormItem>
-          <FormLabel>Alias</FormLabel>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="alias role..."
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <!-- deskripsi -->
+      <!-- description -->
       <FormField v-slot="{ componentField }" name="description">
         <FormItem>
           <FormLabel>Description</FormLabel>
@@ -82,21 +71,38 @@
         </FormItem>
       </FormField>
 
-      <!-- status -->
+      <!-- dueDate -->
+      <FormField v-slot="{ componentField }" name="dueDate">
+        <FormItem>
+          <FormLabel>Due Date</FormLabel>
+          <FormControl>
+            <Input
+              type="date"
+              placeholder="dueDate..."
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <!-- level -->
       <FormField
         v-slot="{ componentField }"
-        name="isActive"
-        :defaultValue="'true'"
+        name="level"
+        :defaultValue="levelTitle"
       >
         <FormItem>
-          <FormLabel>Status</FormLabel>
+          <FormLabel>Level</FormLabel>
           <FormControl>
             <select
               class="border px-3 py-2 rounded w-full"
               v-bind="componentField"
             >
-              <option value="true">Aktif</option>
-              <option value="false">Tidak Aktif</option>
+              <option value="Sangat Penting">Sangat Penting</option>
+              <option value="Cukup Penting">Cukup Penting</option>
+              <option value="Penting">Penting</option>
+              <option value="Tidak Penting">Tidak Penting</option>
             </select>
           </FormControl>
           <FormMessage />
@@ -104,46 +110,26 @@
       </FormField>
     </ModalCreate>
 
-    <!-- Update Role -->
     <ModalEdit
       :modalValue="editData"
-      title="Role"
+      title="Todolist"
       :formSchema="formSchema"
-      :initialValues="RoleDetails"
-      @submitEdit="handleUpdateRole"
+      :initialValues="todoDetails"
+      @submitEdit="handleUpdateTodo"
       @update:modalValue="(v) => (editData = v)"
     >
-      <!-- nama role -->
-      <FormField v-slot="{ componentField }" name="name">
+      <!-- title -->
+      <FormField v-slot="{ componentField }" name="title">
         <FormItem>
-          <FormLabel>Nama Role</FormLabel>
+          <FormLabel>Judul</FormLabel>
           <FormControl>
-            <Input
-              type="text"
-              placeholder="nama role..."
-              v-bind="componentField"
-            />
+            <Input type="text" placeholder="title..." v-bind="componentField" />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
 
-      <!-- alias -->
-      <FormField v-slot="{ componentField }" name="alias">
-        <FormItem>
-          <FormLabel>Alias</FormLabel>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="alias role..."
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <!-- deskripsi -->
+      <!-- description -->
       <FormField v-slot="{ componentField }" name="description">
         <FormItem>
           <FormLabel>Description</FormLabel>
@@ -158,11 +144,49 @@
         </FormItem>
       </FormField>
 
-      <!-- status -->
+      <!-- dueDate -->
+      <FormField v-slot="{ componentField }" name="dueDate">
+        <FormItem>
+          <FormLabel>Due Date</FormLabel>
+          <FormControl>
+            <Input
+              type="date"
+              placeholder="dueDate..."
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <!-- level -->
       <FormField
         v-slot="{ componentField }"
-        name="isActive"
-        :defaultValue="'true'"
+        name="level"
+        :defaultValue="levelTitle"
+      >
+        <FormItem>
+          <FormLabel>Level</FormLabel>
+          <FormControl>
+            <select
+              class="border px-3 py-2 rounded w-full"
+              v-bind="componentField"
+            >
+              <option value="Sangat Penting">Sangat Penting</option>
+              <option value="Cukup Penting">Cukup Penting</option>
+              <option value="Penting">Penting</option>
+              <option value="Tidak Penting">Tidak Penting</option>
+            </select>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <!-- finish -->
+      <FormField
+        v-slot="{ componentField }"
+        name="isFinish"
+        :defaultValue="'false'"
       >
         <FormItem>
           <FormLabel>Status</FormLabel>
@@ -171,8 +195,8 @@
               class="border px-3 py-2 rounded w-full"
               v-bind="componentField"
             >
-              <option value="true">Aktif</option>
-              <option value="false">Tidak Aktif</option>
+              <option value="true">Selesai</option>
+              <option value="false">Belum Selesai</option>
             </select>
           </FormControl>
           <FormMessage />
@@ -186,10 +210,10 @@
 import { ref, onMounted, watch } from 'vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
-import { useForm } from 'vee-validate';
+import { useRoute } from 'vue-router';
 
 import { functionHelper } from '@/utils/functionHelper';
-import { rolesService } from '@/services/rolesService';
+import { todolistService } from '@/services/todolistService';
 
 import {
   FormField,
@@ -199,18 +223,25 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import AppTable from '@/components/organisms/AppTable.vue';
 import ModalCreate from '@/components/organisms/AppModals/ModalCreate.vue';
 import ModalEdit from '@/components/organisms/AppModals/ModalEdit.vue';
 
-const { isActiveRender } = functionHelper();
-const { createRole, getRoles, getDetailRole, updateRole, deleteRole } =
-  rolesService();
+const route = useRoute();
+const { getFormattedDate, getRouteParentName } = functionHelper();
+const {
+  getTodolists,
+  createTodolist,
+  getDetailTodolist,
+  updateTodolist,
+  deleteTodolist,
+} = todolistService();
 const { $swal } = useNuxtApp();
 
 const loading = ref(true);
-const roleData = ref(null);
-const RoleDetails = ref({});
+const todoData = ref(null);
+const todoDetails = ref({});
 
 const search = ref('');
 const currentPage = ref(0);
@@ -220,35 +251,58 @@ const sortOrder = ref('DESC');
 const createData = ref(false);
 const editData = ref(false);
 
-const columns = [
-  { key: '__no', label: '#', sortable: true },
-  { key: 'name', label: 'Name', sortable: true },
-  { key: 'alias', label: 'Alias', sortable: true },
-  {
-    key: 'isActive',
-    label: 'Status',
-    render: (value) => isActiveRender(value),
-  },
-  {
-    key: 'actions',
-    label: 'Aksi',
-    sortable: false,
-  },
-];
+const level = route.params.level;
+const levelTitle =
+  level
+    .replace(/([A-Z]+)/g, ' $1')
+    .charAt(0)
+    .toUpperCase() + level.slice(1).replace(/([A-Z][a-z])/g, ' $1');
+
+const parentRoute = computed(() => {
+  const r = getRouteParentName(route);
+  return r || null;
+});
 
 const formSchema = toTypedSchema(
   z.object({
-    name: z.string(),
-    alias: z.string(),
-    description: z.string().max(255),
-    isActive: z.enum(['true', 'false']).default('true'),
+    title: z.string().min(1).max(255),
+    description: z.string().optional(),
+    level: z.enum([
+      'Sangat Penting',
+      'Cukup Penting',
+      'Penting',
+      'Tidak Penting',
+    ]),
+    isFinish: z.enum(['true', 'false']),
+    dueDate: z.coerce.date(),
   })
 );
 
-const handleCreateRole = async (values) => {
-  try {
-    const result = await createRole(values);
+const columns = [
+  { key: '__no', label: '#', sortable: true },
+  { key: 'title', label: 'Judul Todo', sortable: true },
+  { key: 'description', label: 'Deskripsi', sortable: true },
+  {
+    key: 'dueDate',
+    label: 'Due Date',
+    sortable: true,
+    render: (date) => h('span', getFormattedDate(date)),
+  },
+  {
+    key: 'level',
+    label: 'Level',
+  },
+  {
+    key: 'isFinish',
+    label: 'Status',
+    sortable: true,
+  },
+  { key: 'actions', label: 'Aksi', sortable: false },
+];
 
+const handleCreateTodo = async (values) => {
+  try {
+    const result = await createTodolist(values);
     if (!result.success) throw new Error(result.message || 'Gagal menambahkan');
 
     createData.value = false;
@@ -262,7 +316,7 @@ const handleCreateRole = async (values) => {
         timer: 1000,
       })
       .then(async () => {
-        await handleGetRoles();
+        await handleGetTodolists();
       });
   } catch (e) {
     await $swal.fire({
@@ -273,35 +327,40 @@ const handleCreateRole = async (values) => {
   }
 };
 
-const handleGetRoles = async () => {
+const handleGetTodolists = async () => {
   loading.value = true;
   try {
-    roleData.value = await getRoles({
+    todoData.value = await getTodolists({
       page: currentPage.value,
       search: search.value,
+      level: levelTitle,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
     });
   } catch (e) {
     await $swal.fire({
       icon: 'error',
-      title: 'Gagal Mengambil Data',
-      text: e.message || 'Terjadi kesalahan tidak diketahui',
+      title: 'Gagal mengambil data',
+      text: e.message || 'Terjadi kesalahan diketahui',
     });
   } finally {
     loading.value = false;
   }
 };
 
-const handleDetailRole = async (id) => {
-  console.log('[DEBUG] ID yg diklik:', id); // ⬅️ Tambahkan ini
-
+const handleDetailTodo = async (id) => {
   try {
-    const detail = await getDetailRole(id);
-    RoleDetails.value = JSON.parse(
+    const detail = await getDetailTodolist(id);
+
+    let dateStr = '';
+    if (detail.data.dueDate) {
+      dateStr = new Date(detail.data.dueDate).toISOString().split('T')[0];
+    }
+    todoDetails.value = JSON.parse(
       JSON.stringify({
         ...detail.data,
-        isActive: detail.data.isActive ? 'true' : 'false',
+        isFinish: detail.data.isFinish ? 'true' : 'false',
+        dueDate: dateStr,
       })
     );
     editData.value = true;
@@ -314,10 +373,10 @@ const handleDetailRole = async (id) => {
   }
 };
 
-const handleUpdateRole = async (values) => {
+const handleUpdateTodo = async (values) => {
   try {
     const id = values.id;
-    const result = await updateRole(values, id);
+    const result = await updateTodolist(values, id);
 
     if (!result.success) throw new Error(result.message || 'Gagal mengupdate');
 
@@ -332,7 +391,7 @@ const handleUpdateRole = async (values) => {
         timer: 1000,
       })
       .then(async () => {
-        await handleGetRoles();
+        await handleGetTodolists();
       });
   } catch (e) {
     await $swal.fire({
@@ -343,7 +402,7 @@ const handleUpdateRole = async (values) => {
   }
 };
 
-const handleDeleteRole = async (id) => {
+const handleDeleteTodo = async (id) => {
   const confirm = await $swal.fire({
     icon: 'warning',
     title: `Hapus data ini?`,
@@ -354,21 +413,17 @@ const handleDeleteRole = async (id) => {
 
   if (confirm.isConfirmed) {
     try {
-      await deleteRole(id);
-      await handleGetRoles();
-      await $swal.fire({
+      await deleteTodolist(id);
+      await handleGetTodolists();
+      $swal.fire({
         title: 'Berhasil!',
         text: 'Data berhasil dihapus.',
         icon: 'success',
         timer: 1000,
-        showConfirmButton: false,
+        confirmButtonText: false,
       });
     } catch (e) {
-      await $swal.fire({
-        title: 'Gagal menghapus data',
-        text: e.message,
-        icon: 'error',
-      });
+      $swal.fire('Gagal menghapus data', e.message, 'error');
     }
   }
 };
@@ -390,14 +445,16 @@ watch(
       clearTimeout(debounceTimeout);
 
       debounceTimeout = setTimeout(() => {
-        handleGetRoles();
+        handleGetTodolists();
       }, 500);
     } else {
-      handleGetRoles();
+      handleGetTodolists();
     }
   },
   { immediate: true }
 );
 
-onMounted(handleGetRoles);
+onMounted(handleGetTodolists);
 </script>
+
+<style scoped></style>

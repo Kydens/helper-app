@@ -1,4 +1,5 @@
+.env
 node_modules
-backup_db
 .gitignore
-WI*
+dist
+*.log

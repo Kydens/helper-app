@@ -12,7 +12,8 @@
                 :to="item.url"
                 :class="[
                   'flex items-center gap-2 px-3 py-4 rounded-md text-sm font-medium',
-                  route.path === item.url
+                  route.path === item.url ||
+                  getRouteParentName(route.name) === item.url.split('/')[1]
                     ? 'bg-sidebar-accent-foreground text-sidebar-accent'
                     : 'hover:bg-muted hover:text-foreground',
                 ]"
@@ -76,7 +77,7 @@
           <SidebarMenuItem>
             <Button
               type="submit"
-              class="mt-2 w-full transition-all duration-300 bg-blue-500 text-white hover:bg-destructive hover:cursor-pointer"
+              class="mt-2 w-full transition-all duration-300 text-white hover:bg-destructive hover:cursor-pointer"
               @click="handleLogout"
             >
               Logout
@@ -129,7 +130,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { functionHelper } from '@/utils/functionHelper';
 
+const { getRouteParentName } = functionHelper();
 const masterOpen = ref(false);
 
 const route = useRoute();

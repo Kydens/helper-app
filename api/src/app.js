@@ -4,19 +4,34 @@ const constants = require('./config/constants');
 const pool = require('./config/database');
 const sequelize = require('./config/sequelize');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { default: helmet } = require('helmet');
 
 const app = express();
 const routes = require('./routes');
 
+const allowedOrigins = [
+  // constants.URL_WEB,
+  'http://localhost:3000',
+  'https://helperbyed.vercel.app',
+];
+
 // Menyiapkan izin akses dengan cors
 const corsOption = {
-  origin: [constants.URL_WEB],
+  origin: function (origin, callback) {
+    // allow requests with no origin (like curl, mobile apps)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Content-Disposition'],
-  credetials: true,
+  credentials: true,
 };
 
 /*
@@ -25,6 +40,9 @@ const corsOption = {
 
 // Gunakan compression
 app.use(compression());
+
+// Gunakan cookie parser untuk menangani cookie
+app.use(cookieParser());
 
 // Gunakan body-parser untuk menangani JSON dan URL encode data
 app.use(bodyParser.json());
@@ -41,7 +59,11 @@ app.use(routes);
 
 // Middleware Global untuk memastikan cors dan cache-control
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   next();

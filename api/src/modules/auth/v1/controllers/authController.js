@@ -11,6 +11,105 @@ const {
 } = require('../../../master/v1/services/rolesService');
 const generateUUID = require('../../../../utils/uuidUtil');
 
+exports.refreshToken = async (req, res) => {
+  // console.log('req: ', req);
+  console.log('req.cookies: ', req.cookies);
+  const refreshToken = req.cookies.refresh_token;
+  console.log('refresh_token: ', refreshToken);
+
+  if (!refreshToken) {
+    return sendResponse(
+      res,
+      403,
+      'error',
+      'Anda tidak memiliki akses, silahkan login kembali.'
+    );
+  }
+
+  try {
+    // cek refresh token di db
+    const userCookie = await UserCookies.findOne({
+      where: {
+        refresh_token: refreshToken,
+        is_active: true,
+      },
+    });
+
+    if (!userCookie) {
+      return sendResponse(
+        res,
+        403,
+        'error',
+        'Refresh token tidak valid atau sudah dihapus.'
+      );
+    }
+
+    // cek token by db
+
+    if (new Date() > new Date(userCookie.expired_at)) {
+      await UserCookies.update(
+        { is_active: false },
+        { where: { id: userCookie.id } }
+      );
+      return sendResponse(
+        res,
+        403,
+        'error',
+        'Sesi anda telah berakhir, silahkan login kembali.'
+      );
+    }
+
+    // cek token by jwt
+    let decoded;
+    try {
+      decoded = jwt.verify(userCookie.refresh_token, constants.JWT_SECRET);
+    } catch (error) {
+      await UserCookies.update(
+        { is_active: false },
+        { where: { id: userCookie.id } }
+      );
+
+      return sendResponse(
+        res,
+        403,
+        'error',
+        'Sesi anda telah berakhir, silahkan login kembali.'
+      );
+    }
+
+    const user = await Users.findOne({
+      where: {
+        id: userCookie.user_id,
+      },
+    });
+
+    const rowUser = await getRoleByIdUserService(user.id);
+
+    const dataSign = {
+      id: user.id,
+      username: user.username,
+      role_id: rowUser.roles.id,
+      role_alias: rowUser.roles.alias,
+      device: 'web',
+    };
+
+    let accessTokenExpiresIn = constants.JWT_TIME_DEFAULT;
+    const accessToken = jwt.sign(dataSign, constants.JWT_SECRET, {
+      expiresIn: accessTokenExpiresIn,
+    });
+
+    return sendResponse(res, 200, 'success', 'Refresh token berhasil.', {
+      accessToken: accessToken,
+      userId: user.id,
+      username: user.username,
+      role_alias: rowUser.roles.alias,
+    });
+  } catch (error) {
+    console.error('Error in auth refresh token controller');
+    return sendResponse(res, 500, 'error', 'Server error', error.message);
+  }
+};
+
 exports.login = async (req, res) => {
   const { account, device = 'web', password } = req.body;
 
@@ -79,12 +178,14 @@ exports.login = async (req, res) => {
     });
 
     const refreshTokenExpiresAt = new Date(
-      Date.now() + 7 * 24 * 60 * 60 * 1000
-    ); // 7 hari
+      Date.now() + 30 * 24 * 60 * 60 * 1000
+    ); // 1 bulan
 
-    res.cookie('users_cookies', refreshToken, {
-      httpOnly: false,
-      secure: true,
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: constants.MODE === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     // simpan access token dan refresh token di cookies
@@ -92,9 +193,8 @@ exports.login = async (req, res) => {
       generateUUID(),
       user.id,
       req.ip,
-      accessToken,
       refreshToken,
-      req.headers['user-agent'],
+      String(req.headers['user-agent']),
       refreshTokenExpiresAt
     );
 
@@ -104,7 +204,7 @@ exports.login = async (req, res) => {
       user.id,
       user.username,
       req.ip,
-      req.headers['user-agent'],
+      String(req.headers['user-agent']),
       'login',
       device,
       'Pengguna telah berhasil login'
@@ -113,13 +213,43 @@ exports.login = async (req, res) => {
     return sendResponse(res, 200, 'success', 'Login berhasil', {
       id: user.id,
       username: user.username,
-      email: user.email,
-      telphone: user.telphone,
-      accessToken,
-      refreshToken,
+      role_alias: rowUser.roles.alias,
+      accessToken: accessToken,
     });
   } catch (error) {
     console.error('Error in auth login controller: ', error.message);
+    return sendResponse(res, 500, 'error', 'Server error');
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refresh_token;
+
+    if (!refreshToken) {
+      return sendResponse(
+        res,
+        403,
+        'error',
+        'Anda tidak memiliki akses, silahkan login kembali.'
+      );
+    }
+
+    await UserCookies.update(
+      { is_active: false },
+      { where: { refresh_token: refreshToken } }
+    );
+
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      secure: constants.MODE === 'production',
+      sameSite: 'lax',
+      maxAge: -1,
+    });
+
+    return sendResponse(res, 200, 'success', 'Logout Berhasil!');
+  } catch (error) {
+    console.error('Error in auth logout controller', error.message);
     return sendResponse(res, 500, 'error', 'Server error');
   }
 };

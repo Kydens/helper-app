@@ -417,12 +417,18 @@ const handleDeleteUser = async (id) => {
 };
 
 let debounceTimeout;
+let isInitialFetch = true;
 watch(
   [search, currentPage, sortBy, sortOrder],
   (
     [newSearch, newPage, newSortBy, newSortOrder],
     [oldSearch, oldPage, oldSortBy, oldSortOrder]
   ) => {
+    if (isInitialFetch) {
+      isInitialFetch = false;
+      return;
+    }
+
     if (newSearch !== oldSearch) {
       clearTimeout(debounceTimeout);
 

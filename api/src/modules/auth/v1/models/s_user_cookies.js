@@ -21,10 +21,6 @@ const UserCookies = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    access_token: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
     refresh_token: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -61,7 +57,6 @@ UserCookies.createUserCookie = async function (
   id,
   userId,
   ipAddress,
-  token,
   refresh_token,
   userAgent,
   expiredAt
@@ -70,7 +65,6 @@ UserCookies.createUserCookie = async function (
     id: id,
     user_id: userId,
     ip_address: ipAddress,
-    access_token: token,
     refresh_token: refresh_token,
     browser: userAgent,
     expired_at: expiredAt,

@@ -4,22 +4,24 @@ import { useRouter } from 'vue-router';
 export const useApiFetch = () => {
   const config = useRuntimeConfig();
   const { $fetch } = useNuxtApp();
+  const authStore = useAuthStore();
 
-  const token = useCookie('accessToken', {
-    secure: true,
-    sameSite: 'lax',
-    path: '/',
-  }).value;
+  const token = authStore.accessToken;
 
   return async (url, options = {}) => {
     try {
+
+      if (!authStore.isAuth) {
+        throw new Error('Anda tidak memiliki akses');
+      }
+
       const res = await $fetch(`${config.public.apiBase}${url}`, {
         ...options,
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           'User-Agent': navigator.userAgent,
-          'ngrok-skip-browser-warning': 'true',
+          'ngrok-skip-browser-warning': true,
           Authorization: `Bearer ${token}`,
           ...(options.headers || {}),
         },

@@ -33,8 +33,11 @@
 
 <script setup>
 // Bisa tambahkan global setup jika dibutuhkan
-import AppSidebar from '~/components/organisms/AppSidebar.vue';
-import { SidebarProvider, SidebarTrigger } from '~/components/ui/sidebar';
+import { useRoute } from 'vue-router';
+import AppSidebar from '@/components/organisms/AppSidebar.vue';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { functionHelper } from '@/utils/functionHelper';
 </script>
 
 <style scoped>

@@ -36,7 +36,7 @@
             <div class="pt-0.5">
               <Checkbox
                 :id="`${item.id}`"
-                v-model="item.isFinish"
+                :model-value="item.isFinish"
                 @update:modelValue="
                   (val) => emit('finish', { values: item.id, isFinish: val })
                 "

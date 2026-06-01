@@ -1,6 +1,24 @@
 import { h, resolveComponent } from 'vue';
 
 export const functionHelper = () => {
+  const getRouteParentName = (route) => {
+    if (!route.name) return null;
+
+    const splitRoute = route.name.split('-');
+    if (splitRoute.length <= 1) return null;
+
+    const parentName = splitRoute.slice(0, -1).join('-');
+    return { name: parentName };
+  };
+
+  const getFormattedDate = (date) => {
+    if (!date) return '-';
+    const year = new Date(date).getFullYear();
+    const month = String(new Date(date).getMonth() + 1).padStart(2, '0');
+    const day = String(new Date(date).getDate()).padStart(2, '0');
+    return `${day}-${month}-${year}`;
+  };
+
   const isActiveRender = (value) => {
     const Icon = resolveComponent('Icon');
     if (value === true || value === 1) {
@@ -44,5 +62,5 @@ export const functionHelper = () => {
     return capitalizeWords.charAt(0).toLowerCase() + capitalizeWords.slice(1);
   };
 
-  return { isActiveRender, camelCase };
+  return { getRouteParentName, getFormattedDate, isActiveRender, camelCase };
 };

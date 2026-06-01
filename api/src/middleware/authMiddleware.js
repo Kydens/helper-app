@@ -16,11 +16,10 @@ const authMiddleware = async (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-      return sendResponse(res, 400, 'error', 'Token tidak ditemukan');
+      return sendResponse(res, 401, 'error', 'Token tidak ditemukan');
     }
 
     let decodedUser;
-
     try {
       decodedUser = await jwt.verify(token, constants.JWT_SECRET);
     } catch (err) {
@@ -57,56 +56,11 @@ const authMiddleware = async (req, res, next) => {
         return sendResponse(res, 403, 'error', 'Akun anda telah dinonaktifkan');
       }
 
-      const userCookie = await UserCookies.findOne({
-        where: { access_token: token },
-      });
-
-      if (!userCookie)
-        return sendResponse(res, 403, 'error', 'Session tidak valid!');
-
-      if (!userCookie.is_active) {
-        if (redisAvailable) {
-          await redis.del(redisKey);
-        }
-
-        return sendResponse(res, 403, 'error', 'Akses token dibanned');
-      }
-
-      let refreshDecoded;
-      try {
-        refreshDecoded = await jwt.verify(
-          userCookie.refresh_token,
-          constants.JWT_SECRET
-        );
-      } catch (refreshError) {
-        console.error('Refresh token kedaluwarsa: ', refreshError.message);
-
-        await UserCookies.update(
-          { is_active: 0 },
-          { where: { refresh_token: userCookie.refresh_token } }
-        );
-
-        if (redisAvailable) {
-          await redis.del(redisKey);
-        }
-
-        return sendResponse(
-          res,
-          403,
-          'error',
-          'Refresh token kedaluwarsa, akun dinonaktifkan. Silahkan login kembali.'
-        );
-      }
-
       userData = { is_active: true };
-    }
-
-    if (!userData.is_active) {
-      return sendResponse(res, 403, 'error', 'Akun anda telah dinonaktifkan');
-    }
-
-    if (redisAvailable) {
-      await redis.setex(redisKey, 3600, JSON.stringify(userData));
+    
+      if (redisAvailable) {
+        await redis.setex(redisKey, 3600, JSON.stringify(userData));
+      }
     }
 
     req.user = {
