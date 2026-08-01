@@ -1,5 +1,5 @@
-const { Pool } = require("pg");
-const constants = require("./constants");
+const { Pool } = require('pg');
+const constants = require('./constants');
 
 const pool = new Pool({
   user: constants.USER_DB,

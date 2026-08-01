@@ -58,7 +58,8 @@ const Roles = sequelize.define(
     },
   },
   {
-    tableName: 's_roles',
+    tableName: 'roles',
+    schema: 'master_data',
     timestamps: false,
   }
 );

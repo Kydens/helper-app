@@ -77,13 +77,14 @@ app.get('/', (req, res) => {
   });
 });
 
-require('./modules/auth/v1/models/s_user_roles');
-require('./modules/auth/v1/models/s_user_cookies');
-require('./modules/auth/v1/models/s_user_logs');
-require('./modules/auth/v1/models/s_users');
-require('./modules/features/v1/models/f_wallets');
-require('./modules/features/v1/models/f_todolist');
-require('./modules/master/v1/models/s_roles');
+require('./modules/auth/v1/models/user_roles');
+require('./modules/auth/v1/models/user_cookies');
+require('./modules/auth/v1/models/user_logs');
+require('./modules/auth/v1/models/users');
+require('./modules/features/todolists/v1/models/todolists');
+require('./modules/features/wallets/v1/models/wallets');
+require('./modules/master/v1/models/roles');
+require('./modules/skeleton/v1/models/menus');
 
 const syncDatabase = async () => {
   try {

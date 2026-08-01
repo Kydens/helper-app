@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 const redis = require('../config/redis');
 const sendResponse = require('../utils/responseUtil');
 const constants = require('../config/constants');
-const Users = require('../modules/auth/v1/models/s_users');
-const UserCookies = require('../modules/auth/v1/models/s_user_cookies');
+const Users = require('../modules/auth/v1/models/users');
+const UserCookies = require('../modules/auth/v1/models/user_cookies');
 
 let redisAvailable = true;
 
@@ -57,7 +57,7 @@ const authMiddleware = async (req, res, next) => {
       }
 
       userData = { is_active: true };
-    
+
       if (redisAvailable) {
         await redis.setex(redisKey, 3600, JSON.stringify(userData));
       }

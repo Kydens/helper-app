@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const constants = require('../../../../config/constants');
 const sendResponse = require('../../../../utils/responseUtil');
-const Users = require('../models/s_users');
-const UserCookies = require('../models/s_user_cookies');
-const UserLogs = require('../models/s_user_logs');
+const Users = require('../models/users');
+const UserCookies = require('../models/user_cookies');
+const UserLogs = require('../models/user_logs');
 const {
   getRoleByIdUserService,
 } = require('../../../master/v1/services/rolesService');

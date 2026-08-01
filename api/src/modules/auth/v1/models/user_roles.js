@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../../../../config/sequelize');
 
 const UserRoles = sequelize.define(
-  's_user_roles',
+  'UserRoles',
   {
     id: {
       type: DataTypes.STRING(36),
@@ -54,7 +54,8 @@ const UserRoles = sequelize.define(
     },
   },
   {
-    tableName: 's_user_roles',
+    tableName: 'user_roles',
+    schema: 'master_data',
     timestamps: false,
   }
 );

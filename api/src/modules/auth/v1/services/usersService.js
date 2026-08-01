@@ -10,7 +10,7 @@ const {
   convertArrayToSingleJson,
   getUserIdFromToken,
 } = require('../../../../utils/utils');
-const Users = require('../models/s_users');
+const Users = require('../models/users');
 const {
   getRoleIdUserService,
 } = require('../../../master/v1/services/rolesService');

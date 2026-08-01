@@ -43,7 +43,8 @@ const UserLogs = sequelize.define(
     },
   },
   {
-    tableName: 's_users_logs',
+    tableName: 'user_logs',
+    schema: 'master_data',
     timestamps: false,
   }
 );

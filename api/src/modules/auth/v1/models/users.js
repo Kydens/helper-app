@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../../../../config/sequelize');
 
 const Users = sequelize.define(
-  's_users',
+  'users',
   {
     id: {
       type: DataTypes.STRING(36),
@@ -74,7 +74,8 @@ const Users = sequelize.define(
     },
   },
   {
-    tableName: 's_users',
+    tableName: 'users',
+    schema: 'master_data',
     timestamps: false,
   }
 );

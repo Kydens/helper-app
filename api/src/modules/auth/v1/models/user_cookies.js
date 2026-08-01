@@ -47,7 +47,8 @@ const UserCookies = sequelize.define(
     },
   },
   {
-    tableName: 's_users_cookies',
+    tableName: 'user_cookies',
+    schema: 'master_data',
     timestamps: false,
   }
 );

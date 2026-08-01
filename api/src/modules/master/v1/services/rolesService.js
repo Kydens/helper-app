@@ -1,5 +1,5 @@
 const pool = require('../../../../config/database');
-const Roles = require('../models/s_roles');
+const Roles = require('../models/roles');
 const {
   generateAlias,
   getCheckAlias,
