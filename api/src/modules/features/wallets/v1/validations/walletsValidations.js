@@ -1,5 +1,5 @@
 const validator = require('validator');
-const sendResponse = require('../../../../utils/responseUtil');
+const sendResponse = require('../../../../../utils/responseUtil');
 
 const walletsValidations = (req, res, next) => {
   const { name, description } = req.body;
