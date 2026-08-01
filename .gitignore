@@ -3,3 +3,4 @@ backup_db
 .gitignore
 WI*
 bot
+.vscode
