@@ -19,8 +19,10 @@ export const functionHelper = () => {
     return `${day}-${month}-${year}`;
   };
 
-  const isActiveRender = (value) => {
+  const isActiveData = (value, labels = {}) => {
     const Icon = resolveComponent('Icon');
+    const { trueLabel = 'Aktif', falseLabel = 'Tidak Aktif' } = labels;
+
     if (value === true || value === 1) {
       return h(
         'span',
@@ -28,7 +30,7 @@ export const functionHelper = () => {
           class:
             'inline-flex items-center gap-1 text-green-600 text-xs font-semibold',
         },
-        [h(Icon, { name: 'material-symbols:check-circle' }), 'Aktif']
+        [h(Icon, { name: 'material-symbols:check-circle' }), trueLabel]
       );
     } else if (value === false || value === 2) {
       return h(
@@ -37,7 +39,7 @@ export const functionHelper = () => {
           class:
             'inline-flex items-center gap-1 text-red-600 text-xs font-semibold',
         },
-        [h(Icon, { name: 'material-symbols:cancel' }), 'Tidak Aktif']
+        [h(Icon, { name: 'material-symbols:cancel' }), falseLabel]
       );
     } else {
       return h(
@@ -62,5 +64,10 @@ export const functionHelper = () => {
     return capitalizeWords.charAt(0).toLowerCase() + capitalizeWords.slice(1);
   };
 
-  return { getRouteParentName, getFormattedDate, isActiveRender, camelCase };
+  return {
+    getRouteParentName,
+    getFormattedDate,
+    isActiveData,
+    camelCase,
+  };
 };

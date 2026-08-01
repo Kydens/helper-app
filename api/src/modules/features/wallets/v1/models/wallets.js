@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../../../../config/sequelize');
+const sequelize = require('../../../../../config/sequelize');
 
-const Todolist = sequelize.define(
-  'f_todolist',
+const Wallets = sequelize.define(
+  'wallets',
   {
     id: {
       type: DataTypes.STRING(36),
@@ -30,7 +30,7 @@ const Todolist = sequelize.define(
       allowNull: true,
     },
     deleted_by: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(36),
       allowNull: true,
     },
     is_deleted: {
@@ -38,16 +38,16 @@ const Todolist = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
-    is_finish: {
+    is_active: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false,
+      defaultValue: true,
     },
     user_id: {
       type: DataTypes.STRING(36),
       allowNull: false,
     },
-    title: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -55,25 +55,17 @@ const Todolist = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    level: {
-      type: DataTypes.ENUM(
-        'Sangat Penting',
-        'Cukup Penting',
-        'Penting',
-        'Tidak Penting'
-      ),
+    balances: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
-      defaultValue: 'Penting',
-    },
-    due_date: {
-      type: DataTypes.DATE,
-      allowNull: false,
+      defaultValue: 0,
     },
   },
   {
-    tableName: 'f_todolist',
+    tableName: 'wallets',
+    schema: 'features',
     timestamps: false,
   }
 );
 
-module.exports = Todolist;
+module.exports = Wallets;

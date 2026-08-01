@@ -1,8 +1,8 @@
 const { Op } = require('sequelize');
-const sequelize = require('../../../../config/sequelize');
-const { convertArrayToSingleJson } = require('../../../../utils/utils');
-const generateUUID = require('../../../../utils/uuidUtil');
-const Todolist = require('../models/f_todolist');
+const sequelize = require('../../../../../config/sequelize');
+const { convertArrayToSingleJson } = require('../../../../../utils/utils');
+const generateUUID = require('../../../../../utils/uuidUtil');
+const Todolist = require('../models/todolists');
 
 const createTodolistService = async (req) => {
   const userId = req.user.id;

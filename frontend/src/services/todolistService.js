@@ -31,6 +31,8 @@ export const todolistService = () => {
 
     const url = `${urlApi}?${query.toString()}`;
 
+    let data = apiFetch(url, { method: 'GET' });
+
     return apiFetch(url, { method: 'GET' });
   };
 

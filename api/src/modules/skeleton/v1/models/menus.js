@@ -1,11 +1,12 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../../../../config/sequelize");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../../../config/sequelize');
 
-const Wallets = sequelize.define(
-  "f_wallets",
+const Menus = sequelize.define(
+  'menus',
   {
     id: {
       type: DataTypes.STRING(36),
+      allowNull: false,
       primaryKey: true,
     },
     created_at: {
@@ -14,7 +15,7 @@ const Wallets = sequelize.define(
       defaultValue: DataTypes.NOW,
     },
     created_by: {
-      type: DataTypes.STRING(36),
+      type: DataTypes.STRING,
       allowNull: false,
     },
     updated_at: {
@@ -22,7 +23,7 @@ const Wallets = sequelize.define(
       allowNull: true,
     },
     updated_by: {
-      type: DataTypes.STRING(36),
+      type: DataTypes.STRING,
       allowNull: true,
     },
     deleted_at: {
@@ -30,7 +31,7 @@ const Wallets = sequelize.define(
       allowNull: true,
     },
     deleted_by: {
-      type: DataTypes.STRING(36),
+      type: DataTypes.STRING,
       allowNull: true,
     },
     is_deleted: {
@@ -43,28 +44,33 @@ const Wallets = sequelize.define(
       allowNull: false,
       defaultValue: true,
     },
-    user_id: {
-      type: DataTypes.STRING(36),
+    menu_code: {
+      type: DataTypes.STRING,
       allowNull: false,
+    },
+    part_code: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+    role_alias: {
+      type: DataTypes.ARRAY(DataTypes.TEXT),
+      allowNUll: false,
+      defaultValue: ['USER'],
     },
-    balances: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-      defaultValue: 0,
+    url_content: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
-    tableName: "f_wallets",
+    tableName: 'menus',
+    schema: 'skeleton',
     timestamps: false,
   }
 );
 
-module.exports = Wallets;
+module.exports = Menus;

@@ -1,5 +1,5 @@
-const sendResponse = require("../../../../utils/responseUtil");
-const { checkIsAdmin } = require("../../../../utils/utils");
+const sendResponse = require('../../../../../utils/responseUtil');
+const { checkIsAdmin } = require('../../../../../utils/utils');
 const {
   getAllWalletsService,
   createWalletsService,
@@ -7,7 +7,7 @@ const {
   updateWalletsService,
   deleteWalletsService,
   getWalletsByIdService,
-} = require("../services/walletsService");
+} = require('../services/walletsService');
 
 const createWallets = async (req, res) => {
   try {
@@ -17,16 +17,16 @@ const createWallets = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menambahkan wallet",
+      'success',
+      'Berhasil menambahkan wallet',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal menambahkan wallet",
+      'error',
+      'Gagal menambahkan wallet',
       error.message
     );
   }
@@ -43,9 +43,9 @@ const getAllWallets = async (req, res) => {
     const {
       size = 10,
       page = 0,
-      search = "",
-      sortBy = "created_at",
-      sortOrder = "DESC",
+      search = '',
+      sortBy = 'created_at',
+      sortOrder = 'DESC',
       startDate,
       endDate,
     } = req.query;
@@ -69,8 +69,8 @@ const getAllWallets = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menampilkan semua wallets",
+      'success',
+      'Berhasil menampilkan semua wallets',
       {
         data: result,
         paging: {
@@ -85,8 +85,8 @@ const getAllWallets = async (req, res) => {
     return sendResponse(
       res,
       500,
-      "error",
-      "Gagal menampilkan semua wallets",
+      'error',
+      'Gagal menampilkan semua wallets',
       error.message
     );
   }
@@ -100,16 +100,16 @@ const getWalletsById = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menampilkan wallet",
+      'success',
+      'Berhasil menampilkan wallet',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal menampilkan wallet",
+      'error',
+      'Gagal menampilkan wallet',
       error.message
     );
   }
@@ -123,16 +123,16 @@ const updateWallets = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil mengupdate wallet",
+      'success',
+      'Berhasil mengupdate wallet',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal mengupdate wallet",
+      'error',
+      'Gagal mengupdate wallet',
       error.message
     );
   }
@@ -145,16 +145,16 @@ const deleteWallets = async (req, res) => {
     return sendResponse(
       res,
       200,
-      "success",
-      "Berhasil menghapus wallet",
+      'success',
+      'Berhasil menghapus wallet',
       result
     );
   } catch (error) {
     return sendResponse(
       res,
       400,
-      "error",
-      "Gagal menghapus wallet",
+      'error',
+      'Gagal menghapus wallet',
       error.message
     );
   }

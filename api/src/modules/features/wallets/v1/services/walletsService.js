@@ -1,7 +1,7 @@
-const sequelize = require("../../../../config/sequelize");
-const { convertArrayToSingleJson } = require("../../../../utils/utils");
-const generateUUID = require("../../../../utils/uuidUtil");
-const Wallets = require("../models/f_wallets");
+const sequelize = require('../../../../../config/sequelize');
+const { convertArrayToSingleJson } = require('../../../../../utils/utils');
+const generateUUID = require('../../../../../utils/uuidUtil');
+const Wallets = require('../models/wallets');
 
 const createWalletsService = async (req) => {
   const userId = req.user.id;
@@ -17,7 +17,7 @@ const createWalletsService = async (req) => {
     });
 
     if (checkExistingWallets) {
-      throw new Error("Wallet anda sudah ada.");
+      throw new Error('Wallet anda sudah ada.');
     }
 
     const dataWallet = {
@@ -40,7 +40,7 @@ const createWalletsService = async (req) => {
     if (transaction) {
       await transaction.rollback();
     }
-    console.log("Error in create wallets service: ", error.message);
+    console.log('Error in create wallets service: ', error.message);
     throw error;
   }
 };
@@ -49,9 +49,9 @@ const getAllWalletsService = async (
   userId,
   size,
   offset,
-  search = "",
-  sortBy = "created_at",
-  sortOrder = "DESC",
+  search = '',
+  sortBy = 'created_at',
+  sortOrder = 'DESC',
   startDate,
   endDate
 ) => {
@@ -93,7 +93,7 @@ const getWalletsByIdService = async (id, transaction = null) => {
   });
 
   if (!wallet) {
-    throw new Error("Wallet tidak ditemukan");
+    throw new Error('Wallet tidak ditemukan');
   }
 
   return wallet;
@@ -128,7 +128,7 @@ const updateWalletsService = async (req, id) => {
     if (transaction) {
       await transaction.rollback();
     }
-    console.log("Error in create wallets service: ", error.message);
+    console.log('Error in create wallets service: ', error.message);
     throw error;
   }
 };
@@ -143,12 +143,12 @@ const deleteWalletsService = async (req, id) => {
 
   return Wallets.findOne({
     where: { id: id },
-    attributes: ["id", "name", "is_deleted", "is_deleted", "deleted_at"],
+    attributes: ['id', 'name', 'is_deleted', 'is_deleted', 'deleted_at'],
   });
 };
 
 const getJsonRowWalletsService = (data) => {
-  const checkList = Array.isArray(data) ? "array" : "single";
+  const checkList = Array.isArray(data) ? 'array' : 'single';
   const dataArray = Array.isArray(data) ? data : [data];
 
   const json = dataArray.map((row) => ({
@@ -162,7 +162,7 @@ const getJsonRowWalletsService = (data) => {
     balances: row.balances,
   }));
 
-  if (checkList == "array") {
+  if (checkList == 'array') {
     return json;
   } else {
     return convertArrayToSingleJson(json);

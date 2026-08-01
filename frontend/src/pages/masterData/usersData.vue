@@ -248,7 +248,7 @@ import AppTable from '@/components/organisms/AppTable.vue';
 import ModalCreate from '@/components/organisms/AppModals/ModalCreate.vue';
 import ModalEdit from '@/components/organisms/AppModals/ModalEdit.vue';
 
-const { isActiveRender } = functionHelper();
+const { isActiveData } = functionHelper();
 const { createUser, getUsers, getDetailUser, updateUser, deleteUser } =
   usersService();
 const { $swal } = useNuxtApp();
@@ -274,7 +274,7 @@ const columns = [
   {
     key: 'isActive',
     label: 'Status',
-    render: (value) => isActiveRender(value),
+    render: (value) => isActiveData(value),
   },
   {
     key: 'actions',

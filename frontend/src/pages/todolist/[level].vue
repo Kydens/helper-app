@@ -110,6 +110,7 @@
       </FormField>
     </ModalCreate>
 
+    <!-- Modal Edit Todo -->
     <ModalEdit
       :modalValue="editData"
       title="Todolist"
@@ -171,6 +172,7 @@
             <select
               class="border px-3 py-2 rounded w-full"
               v-bind="componentField"
+              v-model="todoDetails.level"
             >
               <option value="Sangat Penting">Sangat Penting</option>
               <option value="Cukup Penting">Cukup Penting</option>
@@ -194,6 +196,7 @@
             <select
               class="border px-3 py-2 rounded w-full"
               v-bind="componentField"
+              v-model="todoDetails.isFinish"
             >
               <option value="true">Selesai</option>
               <option value="false">Belum Selesai</option>
@@ -229,7 +232,7 @@ import ModalCreate from '@/components/organisms/AppModals/ModalCreate.vue';
 import ModalEdit from '@/components/organisms/AppModals/ModalEdit.vue';
 
 const route = useRoute();
-const { getFormattedDate, getRouteParentName } = functionHelper();
+const { getFormattedDate, getRouteParentName, isActiveData } = functionHelper();
 const {
   getTodolists,
   createTodolist,
@@ -296,6 +299,11 @@ const columns = [
     key: 'isFinish',
     label: 'Status',
     sortable: true,
+    render: (value) =>
+      isActiveData(value, {
+        trueLabel: 'Selesai',
+        falseLabel: 'Belum Selesai',
+      }),
   },
   { key: 'actions', label: 'Aksi', sortable: false },
 ];
@@ -337,6 +345,8 @@ const handleGetTodolists = async () => {
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
     });
+
+    console.log(todoData.value.data);
   } catch (e) {
     await $swal.fire({
       icon: 'error',
@@ -359,7 +369,7 @@ const handleDetailTodo = async (id) => {
     todoDetails.value = JSON.parse(
       JSON.stringify({
         ...detail.data,
-        isFinish: detail.data.isFinish ? 'true' : 'false',
+        isFinish: detail.data.isFinish ? true : false,
         dueDate: dateStr,
       })
     );

@@ -5,6 +5,7 @@
       :class="colorCard"
     >
       <h3 class="text-md font-medium text-white">{{ level }}</h3>
+      <!-- view dimatikan karena sementara akan develop max 5 item -->
       <div class="flex gap-2 items-center">
         <NuxtLink
           :to="`/todolist/${camelCase(level)}`"
@@ -32,7 +33,7 @@
 
       <div v-else class="p-4 rounded-xl flex-col h-full" :class="bgCardSoft">
         <template v-for="(item, index) in data.slice(0, 3)" :key="item.id">
-          <div class="flex items-start space-x-2 w-full cursor-pointer">
+          <div class="flex items-start space-x-2 w-full">
             <div class="pt-0.5">
               <Checkbox
                 :id="`${item.id}`"
@@ -44,7 +45,10 @@
               />
             </div>
 
-            <label class="flex flex-col w-full" :for="`${item.id}`">
+            <label
+              class="flex flex-col w-full hover:cursor-pointer"
+              :for="`${item.id}`"
+            >
               <div class="flex w-full justify-between">
                 <p
                   :class="
