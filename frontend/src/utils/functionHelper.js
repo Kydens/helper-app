@@ -54,6 +54,7 @@ export const functionHelper = () => {
   };
 
   const camelCase = (str) => {
+    if (!str) return;
     const words = str.split(' ');
     const capitalizeWords = words
       .map((word) => {
@@ -64,10 +65,19 @@ export const functionHelper = () => {
     return capitalizeWords.charAt(0).toLowerCase() + capitalizeWords.slice(1);
   };
 
+  const snakeCase = (str) => {
+    const words = str.split(' ');
+    return String(str)
+      .replace(/([a-z])([A-Z])/g, '$1_$2')
+      .replace(/[\s-]+/g, '_')
+      .toLowerCase();
+  };
+
   return {
     getRouteParentName,
     getFormattedDate,
     isActiveData,
     camelCase,
+    snakeCase,
   };
 };
