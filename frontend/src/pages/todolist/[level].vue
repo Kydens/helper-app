@@ -162,7 +162,7 @@
 
       <!-- level -->
       <FormField
-        v-slot="{ componentField }"
+        v-slot="{ value, handleChange, handleBlur }"
         name="level"
         :defaultValue="levelTitle"
       >
@@ -171,8 +171,9 @@
           <FormControl>
             <select
               class="border px-3 py-2 rounded w-full"
-              v-bind="componentField"
-              v-model="todoDetails.level"
+              :value="value"
+              @change="handleChange"
+              @blur="handleBlur"
             >
               <option value="Sangat Penting">Sangat Penting</option>
               <option value="Cukup Penting">Cukup Penting</option>
@@ -186,7 +187,7 @@
 
       <!-- finish -->
       <FormField
-        v-slot="{ componentField }"
+        v-slot="{ value, handleChange, handleBlur }"
         name="isFinish"
         :defaultValue="'false'"
       >
@@ -195,8 +196,9 @@
           <FormControl>
             <select
               class="border px-3 py-2 rounded w-full"
-              v-bind="componentField"
-              v-model="todoDetails.isFinish"
+              :value="value"
+              @change="handleChange"
+              @blur="handleBlur"
             >
               <option value="true">Selesai</option>
               <option value="false">Belum Selesai</option>
@@ -345,8 +347,7 @@ const handleGetTodolists = async () => {
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
     });
-
-    console.log(todoData.value.data);
+    console.log(todoData.value);
   } catch (e) {
     await $swal.fire({
       icon: 'error',
@@ -373,6 +374,7 @@ const handleDetailTodo = async (id) => {
         dueDate: dateStr,
       })
     );
+    console.log(todoDetails.value);
     editData.value = true;
   } catch (e) {
     await $swal.fire({

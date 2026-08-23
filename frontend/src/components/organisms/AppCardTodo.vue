@@ -69,7 +69,7 @@
             </label>
           </div>
 
-          <hr v-if="index !== data.length - 1" class="my-4" />
+          <hr v-if="index !== data.length - 1 && index < 2" class="my-4" />
         </template>
       </div>
     </CardContent>
