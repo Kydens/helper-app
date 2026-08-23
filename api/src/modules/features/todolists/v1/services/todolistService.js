@@ -112,7 +112,7 @@ const updateTodolistService = async (req, id) => {
       updated_by: userId,
       is_finish: row.isFinish,
       user_id: userId,
-      name: row.name,
+      title: row.title,
       description: row.description,
       level: row.level,
       due_date: row.dueDate,
