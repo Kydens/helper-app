@@ -133,7 +133,7 @@ const getRoleById = async (req, res) => {
 };
 
 const updateRole = async (req, res) => {
-  if (!checkIsAdmin)
+  if (!checkIsAdmin(req))
     return sendResponse(
       res,
       403,
@@ -164,7 +164,7 @@ const updateRole = async (req, res) => {
 };
 
 const deleteRole = async (req, res) => {
-  if (!checkIsAdmin)
+  if (!checkIsAdmin(req))
     return sendResponse(
       res,
       403,

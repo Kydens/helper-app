@@ -36,7 +36,7 @@ const createTodolist = async (req, res) => {
 const getAllTodolist = async (req, res) => {
   let userId = req.user.id;
 
-  if (checkIsAdmin) {
+  if (checkIsAdmin(req)) {
     userId = null;
   }
 
