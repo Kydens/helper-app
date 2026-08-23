@@ -1,6 +1,8 @@
 import { useApiFetch } from '@/composables/useApiFetch';
+import { functionHelper } from '@/utils/functionHelper';
 
 export const todolistService = () => {
+  const { snakeCase } = functionHelper();
   const apiFetch = useApiFetch();
   const urlApi = '/api/features/todolist';
 
@@ -26,14 +28,16 @@ export const todolistService = () => {
     if (size !== null) query.append('size', size);
     if (search) query.append('search', search);
     if (level) query.append('level', level);
-    if (sortBy) query.append('sortBy', sortBy);
+    if (sortBy) query.append('sortBy', snakeCase(sortBy));
     if (sortOrder) query.append('sortOrder', sortOrder);
+    console.log(sortBy);
+    console.log(snakeCase(sortBy));
 
     const url = `${urlApi}?${query.toString()}`;
 
     let data = apiFetch(url, { method: 'GET' });
 
-    return apiFetch(url, { method: 'GET' });
+    return data;
   };
 
   const getDetailTodolist = async (id) => {
