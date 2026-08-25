@@ -67,7 +67,7 @@ const Todolist = sequelize.define(
     },
     due_date: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
