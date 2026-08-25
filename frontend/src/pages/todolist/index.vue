@@ -14,6 +14,8 @@
         :colorCard="item.colorCard"
         :bgCardSoft="item.bgCardSoft"
         @finish="handleFinishTodolist"
+        @create="handleCreateTodolist"
+        @delete="handleDeleteTodolist"
       />
     </div>
   </div>
@@ -25,7 +27,8 @@ import AppCardTodo from '@/components/organisms/AppCardTodo.vue';
 
 import { todolistService } from '@/services/todolistService';
 
-const { getTodolists, getTodolistFinish } = todolistService();
+const { getTodolists, getTodolistFinish, createTodolist, deleteTodolist } =
+  todolistService();
 const { $swal } = useNuxtApp();
 
 const loading = ref(true);
@@ -35,7 +38,6 @@ const sortOrder = ref('DESC');
 const sortBy = ref('due_date');
 const todolistData = ref([]);
 const pendingUpdates = ref(new Map()); // set untuk update finish todo
-// let finishTimeout;
 let finishTimeout = null;
 
 const levelTodo = [
@@ -78,37 +80,80 @@ const handleGetTodolistsByLevel = async (levelParams) => {
   }
 };
 
+// Quick-add ala notepad dari AppCardTodo: cuma title + level, tanpa modal
+const handleCreateTodolist = async ({ title, level: itemLevel }) => {
+  // id sementara biar langsung kelihatan di card sebelum response server datang
+  const tempId = `temp-${Date.now()}`;
+  const optimisticTodo = {
+    id: tempId,
+    title,
+    description: '',
+    level: itemLevel,
+    isFinish: false,
+  };
+
+  todolistData.value = [optimisticTodo, ...todolistData.value];
+
+  try {
+    const result = await createTodolist({ title, level: itemLevel });
+
+    if (!result.success) {
+      throw new Error(result.message || 'Gagal menambahkan todo');
+    }
+
+    // ganti data optimis dengan data asli dari server (id, createdAt, dll)
+    const index = todolistData.value.findIndex((t) => t.id === tempId);
+    if (index !== -1) {
+      todolistData.value.splice(index, 1, result.data);
+    }
+  } catch (e) {
+    // rollback kalau gagal
+    todolistData.value = todolistData.value.filter((t) => t.id !== tempId);
+
+    await $swal.fire({
+      icon: 'error',
+      title: 'Gagal menambahkan todo',
+      text: e.message || 'Terjadi kesalahan tidak diketahui',
+    });
+  }
+};
+
+const handleDeleteTodolist = async (id) => {
+  const confirm = await $swal.fire({
+    icon: 'warning',
+    title: 'Hapus list ini?',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, Hapus',
+    cancelButtonText: 'Batal',
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  const findListRemoved = todolistData.value.find((v) => v.id === id);
+  todolistData.value = todolistData.value.filter((v) => v.id !== id);
+
+  try {
+    const result = await deleteTodolist(id);
+    if (result?.success === false) {
+      throw new Error(result.message || 'Gagal menghapus Todo');
+    }
+
+    // await handleGetTodolistsByLevel(findListRemoved.level);
+    await handleGetTodolistsByLevel();
+  } catch (e) {
+    if (findListRemoved) {
+      todolistData.value = [...todolistData.value, findListRemoved];
+    }
+
+    await $swal.fire({
+      icon: 'error',
+      title: 'Gagal menghapus todo',
+      text: e.message,
+    });
+  }
+};
+
 const handleFinishTodolist = async ({ values, isFinish }) => {
-  // clearTimeout(finishTimeout);
-  // finishTimeout = setTimeout(async () => {
-  //   console.log('Updated Todo:', values, isFinish);
-  //   try {
-  //     const id = values;
-  //     const result = await getTodolistFinish({ isFinish }, id);
-
-  //     if (!result.success)
-  //       throw new Error(result.message || 'Gagal mengupdate');
-
-  //     await $swal
-  //       .fire({
-  //         icon: 'success',
-  //         title: 'Berhasil!',
-  //         text: result.message || 'Berhasil mengupdate data',
-  //         showConfirmButton: false,
-  //         timer: 500,
-  //       })
-  //       .then(async () => {
-  //         await handleGetTodolistsByLevel();
-  //       });
-  //   } catch (e) {
-  //     await $swal.fire({
-  //       icon: 'error',
-  //       title: 'Gagal mengupdate data',
-  //       text: e.message || 'Terjadi kesalahan tidak diketahui',
-  //     });
-  //   }
-  // }, 1000);
-
   const todo = todolistData.value.find((d) => d.id === values);
   if (!todo) return;
 

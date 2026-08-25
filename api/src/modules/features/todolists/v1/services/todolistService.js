@@ -17,12 +17,13 @@ const createTodolistService = async (req) => {
       id: generateUUID(),
       created_at: now,
       created_by: userId,
-      is_finish: row.isFinish,
+      is_finish: row.isFinish ?? false,
       user_id: userId,
       title: row.title,
-      description: row.description,
-      level: row.level,
-      due_date: row.dueDate,
+      // dibuat optional karena perubahan flow todolist menjadi seperti notepad
+      description: row.description ?? null,
+      level: row.level ?? 'Penting',
+      due_date: row.dueDate ?? null,
     };
 
     const rowTodolist = await Todolist.create(dataTodo, { transaction });
@@ -85,6 +86,7 @@ const getAllTodolistService = async (
   return { data: rows, total: count };
 };
 
+// not used for a while
 const getTodolistByIdService = async (id, transaction = null) => {
   const todolist = Todolist.findOne({
     where: { id: id, is_deleted: false },
@@ -111,14 +113,16 @@ const updateTodolistService = async (req, id) => {
       updated_at: now,
       updated_by: userId,
       is_finish: row.isFinish,
-      user_id: userId,
       title: row.title,
       description: row.description,
       level: row.level,
       due_date: row.dueDate,
     };
 
-    await Todolist.update(dataTodo, { where: { id: id }, transaction });
+    await Todolist.update(dataTodo, {
+      where: { id, user_id: userId },
+      transaction,
+    });
 
     const getList = await getTodolistByIdService(id, transaction);
 
@@ -134,13 +138,24 @@ const updateTodolistService = async (req, id) => {
 const deleteTodolistService = async (req, id) => {
   const userId = req.user.id;
   const now = new Date();
+
+  const whereClause = {
+    id: id,
+    is_deleted: false,
+  };
+
+  // role admin cannot delete todolist user
+  if (req.user.role_alias !== 'ADMIN') {
+    whereClause.user_id = userId;
+  }
+
   await Todolist.update(
     { is_deleted: true, deleted_by: userId, deleted_at: now },
-    { where: { id: id } }
+    { where: whereClause }
   );
 
   return Todolist.findOne({
-    where: { id: id },
+    where: { id: id, user_id: userId },
     attributes: ['id', 'title', 'is_deleted', 'deleted_at', 'deleted_by'],
   });
 };
@@ -158,7 +173,8 @@ const getTodolistFinishService = async (req, id) => {
       is_deleted: false,
     };
 
-    if (req.user.role !== 'ADMIN') {
+    // role_alias, bukan role -- req.user tidak pernah punya field "role"
+    if (req.user.role_alias !== 'ADMIN') {
       whereClause.user_id = userId;
     }
 
@@ -177,7 +193,9 @@ const getTodolistFinishService = async (req, id) => {
       attributes: ['id', 'level', 'is_finish'],
     });
   } catch (error) {
-    await transaction.rollback();
+    if (transaction) {
+      await transaction.rollback();
+    }
     console.log('Error in get todolist finish service: ', error.message);
     throw error;
   }
